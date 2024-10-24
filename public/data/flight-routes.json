@@ -1,0 +1,358 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Germany to Spain"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [10.4515, 51.1657],
+          [-3.7038, 40.4168]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Germany"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.4515, 51.1657]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Spain"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.7038, 40.4168]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Pakistan to China"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [69.3451, 30.3753],
+          [104.1954, 35.8617]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Pakistan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [69.3451, 30.3753]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "China"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [104.1954, 35.8617]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Saudi Arabia to South Africa"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [45.0792, 23.8859],
+          [22.9375, -30.5595]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Saudi Arabia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [45.0792, 23.8859]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "South Africa"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [22.9375, -30.5595]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "USA to UK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-95.7129, 37.0902],
+          [-0.1278, 51.5074]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "USA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-95.7129, 37.0902]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "UK"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.1278, 51.5074]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Norway to Finland"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [8.4689, 60.472],
+          [24.9354, 61.9241]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Norway"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.4689, 60.472]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Finland"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [24.9354, 61.9241]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Australia to India"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [133.7751, -25.2744],
+          [78.9629, 20.5937]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Australia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [133.7751, -25.2744]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "India"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [78.9629, 20.5937]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Japan to Malaysia"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [138.2529, 36.2048],
+          [101.9758, 4.2105]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Japan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.2529, 36.2048]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Malaysia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.9758, 4.2105]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Mexico to Brazil"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-102.5528, 23.6345],
+          [-51.9253, -14.235]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Mexico"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-102.5528, 23.6345]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Brazil"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-51.9253, -14.235]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Argentina to Kenya"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-63.6167, -38.4161],
+          [37.9062, -1.2864]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Argentina"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-63.6167, -38.4161]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Kenya"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.9062, -1.2864]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Iceland to Canada"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-19.0208, 64.9631],
+          [-106.3468, 56.1304]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Iceland"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-19.0208, 64.9631]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Canada"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-106.3468, 56.1304]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route": "Ukraine to Russia"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [30.7333, 49.0454],
+          [105.3188, 61.524]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city": "Ukraine"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [30.7333, 49.0454]
+      }
+    }
+  ]
+}
