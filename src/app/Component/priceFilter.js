@@ -201,19 +201,22 @@ const Prices = () => {
           marginTop: "16px",
         }} />
         <Box sx={{
-          padding: "0px 22px"
+          padding: "0px 12px 0px 12px"
         }}>
           <Box sx={{
             display: 'flex',
             justifyContent: "space-between",
             alignItems: "center",
+            marginBottom: "10px",
             gap: "5px",
           }}>
-            <Typography mt={1} sx={{
-              fontSize: '12px',
-            }}>
-              Range <br /> ${priceRange[0]} - ${priceRange[1]}
+            <Typography mt={1} sx={{ fontSize: '14px', color: '#1c1d2e' }}>
+              Range <br />
+              <span style={{ color: '#757575' }}>
+                ${priceRange[0]} - ${priceRange[1]}
+              </span>
             </Typography>
+
 
 
             {allRange && (
@@ -227,7 +230,9 @@ const Prices = () => {
               </Button>
             )}
           </Box>
-          <CustomSlider value={priceRange} mt={1} onChange={handlePriceChange} />
+          <CustomSlider value={priceRange} mt={2} onChange={handlePriceChange} sx={{
+            marginTop: "10px"
+          }} />
         </Box>
       </Box>
 

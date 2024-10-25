@@ -10,14 +10,12 @@ import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import { PiUserCircleThin } from "react-icons/pi";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
-// import { VscArrowSwap } from "react-icons/vsc";
-// import { MdOutlineSwapHoriz } from "react-icons/md";
 import { FaExchangeAlt } from "react-icons/fa";
 
 
 export default function Header() {
-  const fromPlaceholder = "From"; // Placeholder for the first TextField
-  const toPlaceholder = "To"; // Placeholder for the second TextField
+  const fromPlaceholder = "From";
+  const toPlaceholder = "To";
   const [isHovered, setIsHovered] = useState(false);
   const [isHovered2, setIsHovered2] = useState(false);
 
@@ -245,7 +243,6 @@ export default function Header() {
               textAlign: "center",
               ml: "32px",
               fontSize: "9px",
-              // fontWeight: "600",
               color: "#757575",
               marginTop: "-4px",
               fontFamily: '"Inter", sans-serif',

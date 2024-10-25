@@ -147,10 +147,11 @@ const Duration = () => {
             alignItems: "center",
             gap: "5px",
           }}>
-            <Typography mt={1} sx={{
-              fontSize: '12px',
-            }}>
-              Range <br /> ${priceRange[0]} - ${priceRange[1]}
+            <Typography mt={1} sx={{ fontSize: '14px', color: '#1c1d2e' }}>
+              Range <br />
+              <span style={{ color: '#757575' }}>
+                ${priceRange[0]} - ${priceRange[1]}
+              </span>
             </Typography>
 
 

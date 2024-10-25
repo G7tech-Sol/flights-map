@@ -15,6 +15,10 @@ import '@fontsource/inter/700.css';
 import PriceFilter from './priceFilter';
 import DistanceFilter from './DistanceFilter';
 import DurationFilter from './DurationFilter';
+import AlliencesFilter from './AllienceFilter';
+import AirCraftFilter from './AirCraftFilter';
+import AirlinesFilter from './AirlinesFilter';
+import ClassFilter from './ClassFilter';
 
 // Styled Components
 const Search = styled('div')(({ theme }) => ({
@@ -117,7 +121,9 @@ const FilterDropdown = ({
   const isSelected = selectedOption !== 'All';
 
   return (
-    <Box>
+    <Box sx={{
+      borderRadius: "31px"
+    }} >
       <Button
         sx={{
           fontSize: '0.85rem',
@@ -125,7 +131,7 @@ const FilterDropdown = ({
           textTransform: 'none',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'center',
           border: `2px solid ${isSelected || isFocused ? '#FFBF00' : 'transparent'
             }`,
@@ -158,71 +164,82 @@ const FilterDropdown = ({
         </Box>
       </Button>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        {/* {children} */}
-        <RadioGroup
-          value={selectedOption}
-          onChange={handleOptionChangeAndClose}
-          sx={{ padding: '8px 15px', width: '200px' }}
+      <Box sx={{
+        // borderRadius: "8px"
+      }}>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+          sx={{
+            overflow: 'visible',
+            marginTop: "5px",
+            // marginLeft: "5rem",
+            borderRadius: '8px',
+            padding: '10px 18px',
+          }}
         >
-          {searchEnabled && (
-            <Search>
-              <StyledInputBase
-                placeholder={`Search ${filter.toLowerCase()}`}
-                onChange={handleSearchChange}
-                value={searchTerm}
-                variant="outlined"
-                size="small"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ fontSize: '20px', color: '#777' }} />
-                    </InputAdornment>
-                  ),
-                }}
-                fullWidth
-              />
-            </Search>
-          )}
+          {/* {children} */}
+          <RadioGroup
+            value={selectedOption}
+            onChange={handleOptionChangeAndClose}
+            sx={{ padding: '0px 15px', width: '210px', }}
+          >
+            {searchEnabled && (
+              <Search>
+                <StyledInputBase
+                  placeholder={`Search ${filter.toLowerCase()}`}
+                  onChange={handleSearchChange}
+                  value={searchTerm}
+                  variant="outlined"
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ fontSize: '20px', color: '#777' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Search>
+            )}
 
-          <FormControlLabel
-            value="All"
-            control={<CustomRadio />}
-            label="All"
-            sx={{
-              '.MuiFormControlLabel-label': { fontSize: '0.85rem' },
-              '&:hover': {
-                backgroundColor: '#f2f2f2',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              },
-            }}
-          />
-          <Divider />
-          {filteredOptions?.map((option, idx) => (
             <FormControlLabel
-              key={idx}
-              value={option}
+              value="All"
               control={<CustomRadio />}
-              label={option}
+              label="All"
               sx={{
                 '.MuiFormControlLabel-label': { fontSize: '0.85rem' },
                 '&:hover': {
                   backgroundColor: '#f2f2f2',
-                  borderRadius: '8px',
+                  borderRadius: '28px',
                   cursor: 'pointer',
                 },
               }}
             />
-          ))}
-        </RadioGroup>
-      </Menu>
+            <Divider />
+            {filteredOptions?.map((option, idx) => (
+              <FormControlLabel
+                key={idx}
+                value={option}
+                control={<CustomRadio />}
+                label={option}
+                sx={{
+                  '.MuiFormControlLabel-label': { fontSize: '0.85rem' },
+                  '&:hover': {
+                    backgroundColor: '#f2f2f2',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                  },
+                }}
+              />
+            ))}
+          </RadioGroup>
+        </Menu>
+      </Box>
     </Box>
   );
 };
@@ -280,29 +297,32 @@ const AlliancesFilter = () => {
       options={optionsAlliances}
       selectedOption={selectedOption}
       onOptionChange={handleOptionChange}
+      sx={{
+        borderRadius: "20px"
+      }}
     />
   );
 };
 
 // Airlines Filter Component
-const AirlinesFilter = () => {
-  const [selectedOption, setSelectedOption] = useState('All');
-  const optionsAirlines = ['Airline A', 'Airline B', 'Airline C', 'Airline D'];
+// const AirlinesFilter = () => {
+//   const [selectedOption, setSelectedOption] = useState('All');
+//   const optionsAirlines = ['Airline A', 'Airline B', 'Airline C', 'Airline D'];
 
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
+//   const handleOptionChange = (event) => {
+//     setSelectedOption(event.target.value);
+//   };
 
-  return (
-    <FilterDropdown
-      filter="Airlines"
-      options={optionsAirlines}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-      searchEnabled
-    />
-  );
-};
+//   return (
+//     <FilterDropdown
+//       filter="Airlines"
+//       options={optionsAirlines}
+//       selectedOption={selectedOption}
+//       onOptionChange={handleOptionChange}
+//       searchEnabled
+//     />
+//   );
+// };
 
 // Classes Filter Component
 const ClassesFilter = () => {
@@ -344,41 +364,6 @@ const AircraftFilter = () => {
   );
 };
 
-const Distance = () => {
-  const [selectedOption, setSelectedOption] = useState('All');
-  const optionsAlliances = [];
-
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-
-  return (
-    <FilterDropdown
-      filter="Distance"
-      options={optionsAlliances}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-    />
-  );
-};
-
-const Duration = () => {
-  const [selectedOption, setSelectedOption] = useState('All');
-  const optionsAlliances = [];
-
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-
-  return (
-    <FilterDropdown
-      filter="Duration"
-      options={optionsAlliances}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-    />
-  );
-};
 
 // RideFilter Main Component
 const RideFilter = () => {
@@ -386,7 +371,6 @@ const RideFilter = () => {
     <Box sx={{
       marginLeft: '20px',
     }}>
-      <Divider />
       <Box
         bgcolor="white"
         display="flex"
@@ -398,13 +382,12 @@ const RideFilter = () => {
       >
         <Dates />
         <PriceFilter />
-        <AlliancesFilter />
+        <AlliencesFilter />
         <AirlinesFilter />
-        <ClassesFilter />
-        <AircraftFilter />
+        <ClassFilter />
+        <AirCraftFilter />
         <DistanceFilter />
         <DurationFilter />
-
       </Box>
     </Box>
   );
