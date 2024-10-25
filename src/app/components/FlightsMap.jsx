@@ -5,7 +5,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { point } from "@turf/helpers";
 import greatCircle from "@turf/great-circle";
-import { Autocomplete, TextField, Grid, Box } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 const countryCoordinates = {
   Germany: [10.4515, 51.1657],
@@ -31,13 +31,13 @@ const countryCoordinates = {
   Egypt: [30.8025, 26.8206],
 };
 
-const FlightsMap = () => {
+const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const mapContainer = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
-  const [source, setSource] = useState(null);
-  const [destination, setDestination] = useState(null);
-  const [filteredDestinations, setFilteredDestinations] = useState(Object.keys(countryCoordinates));
   const [error, setError] = useState(null);
+  const [hasSubmittedRoute, setHasSubmittedRoute] = useState(false);
+
+  let sourceSetLocally = false;
 
   useEffect(() => {
     const map = new maplibregl.Map({
@@ -67,16 +67,15 @@ const FlightsMap = () => {
         paint: { "circle-radius": 6, "circle-color": "blue" },
       });
 
-      let sourceSetLocally = false;
-
       map.on("click", "country-circles", (e) => {
         const countryName = e.features[0].properties.name;
 
         if (!sourceSetLocally) {
-          handleSourceChange(e, countryName);
+          handleSourceChange(countryName);
           sourceSetLocally = true;
         } else {
-          handleDestinationChange(e, countryName);
+          handleDestinationChange(countryName);
+          sourceSetLocally = false;
         }
       });
 
@@ -105,22 +104,14 @@ const FlightsMap = () => {
     return curvedLine.geometry.coordinates;
   };
 
-  const handleSourceChange = (event, newValue) => {
+  const handleSourceChange = (newValue) => {
     setSource(newValue);
     setDestination(null);
     setError(null);
-
-    if (newValue) {
-      const validDestinations = Object.keys(countryCoordinates).filter(
-        (country) => country !== newValue
-      );
-      setFilteredDestinations(validDestinations);
-    } else {
-      setFilteredDestinations(Object.keys(countryCoordinates));
-    }
+    setHasSubmittedRoute(false);
   };
 
-  const handleDestinationChange = (event, newValue) => {
+  const handleDestinationChange = (newValue) => {
     setDestination(newValue);
     setError(null);
   };
@@ -128,9 +119,6 @@ const FlightsMap = () => {
   const handleSubmit = () => {
     const currentSource = source;
     const currentDestination = destination;
-
-    console.log("Source:", currentSource);
-    console.log("Dest:", currentDestination);
 
     if (!currentSource || !currentDestination) {
       setError("Please select both a source and a destination.");
@@ -187,41 +175,65 @@ const FlightsMap = () => {
 
       mapInstance.fitBounds(bounds, { padding: 80 });
       setError(null);
+      setHasSubmittedRoute(true);
     } else {
       if (mapInstance.getLayer("dynamic-flight-route-layer")) {
         mapInstance.removeLayer("dynamic-flight-route-layer");
         mapInstance.removeSource("dynamic-flight-route");
       }
-      setError("No valid route found between the selected source and destination.");
+      setError(
+        "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
+      );
+    }
+  };
+
+  const handleNewPointSelection = () => {
+    if (hasSubmittedRoute) {
+      setSource(null);
+      setDestination(null);
+      setHasSubmittedRoute(false);
     }
   };
 
   return (
-    <Box sx={{ height: "calc(100vh - 73px)", display: "flex", paddingX: 2 }}>
-      <Grid container sx={{ height: "100%", flex: 1 }}>
-        <Grid item xs={12} md={3} sx={{ paddingRight: 2 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Autocomplete
-                options={Object.keys(countryCoordinates)}
-                value={source}
-                onChange={handleSourceChange}
-                renderInput={(params) => <TextField {...params} label="Select Source" />}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Autocomplete
-                options={filteredDestinations}
-                value={destination}
-                onChange={handleDestinationChange}
-                renderInput={(params) => <TextField {...params} label="Select Destination" />}
-              />
-            </Grid>
+    <Box sx={{ height: "calc(100vh - 75px)", display: "flex", padding: 2, paddingBottom: 0 }}>
+      <Grid container spacing={2} sx={{ height: "100%", flex: 1 }}>
+        <Grid item xs={12} md={3}>
+          <Grid container spacing={2} sx={{ padding: "16px 0px 0px 16px" }}>
+            <Typography variant="h6" sx={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>
+              Instructions:
+            </Typography>
+            <Typography sx={{ fontFamily: '"Inter", sans-serif' }}>
+              Click on the circles on the map to select a source and a destination country.
+            </Typography>
 
             {error && (
-              <Grid item xs={12}>
-                <Box color="red">{error}</Box>
+              <Grid xs={12}>
+                <Box
+                  sx={{
+                    marginTop: 2,
+                    backgroundColor: "#ffdddd",
+                    color: "#d8000c",
+                    padding: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid #d8000c",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <span
+                    style={{
+                      marginRight: 16,
+                      fontSize: 20,
+                      lineHeight: 1,
+                    }}
+                  >
+                    ⚠️
+                  </span>
+                  <span style={{ fontWeight: "bold", fontFamily: '"Inter", sans-serif' }}>
+                    {error}
+                  </span>
+                </Box>
               </Grid>
             )}
           </Grid>
@@ -235,6 +247,7 @@ const FlightsMap = () => {
               height: "100%",
               width: "100%",
             }}
+            onClick={handleNewPointSelection}
           />
         </Grid>
       </Grid>
