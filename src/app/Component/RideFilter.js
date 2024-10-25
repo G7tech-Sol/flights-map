@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { Children, useState } from 'react';
 import {
   Box, Typography, Button, Menu, RadioGroup,
   FormControlLabel, Divider, Radio, TextField, InputAdornment
@@ -10,7 +10,11 @@ import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/600.css';
+import { Slider } from '@mui/material';
 import '@fontsource/inter/700.css';
+import PriceFilter from './priceFilter';
+import DistanceFilter from './DistanceFilter';
+import DurationFilter from './DurationFilter';
 
 // Styled Components
 const Search = styled('div')(({ theme }) => ({
@@ -24,7 +28,7 @@ const Search = styled('div')(({ theme }) => ({
 }));
 
 const CustomRadio = styled(Radio)(({ theme }) => ({
-  color: 'f2f2f2',
+  color: '#f2f2f2',
   '&.Mui-checked': {
     color: '#FFBF00',
   },
@@ -71,154 +75,13 @@ const CustomSlider = (props) => (
 );
 
 
-// const FilterDropdown = ({ filter, options, selectedOption, onOptionChange, searchEnabled }) => {
-//   const [anchorEl, setAnchorEl] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [filteredOptions, setFilteredOptions] = useState(options);
-//   const [isFocused, setIsFocused] = useState(false);
-
-//   const handleOpenMenu = (event) => {
-//     setAnchorEl(event.currentTarget);
-//     setSearchTerm('');
-//     setFilteredOptions(options);
-//     setIsFocused(true);
-//   };
-
-//   const handleCloseMenu = () => {
-//     setAnchorEl(null);
-//     setIsFocused(false);
-//   };
-
-//   const handleSearchChange = (e) => {
-//     setSearchTerm(e.target.value);
-//     setFilteredOptions(options.filter(option =>
-//       option.toLowerCase().includes(e.target.value.toLowerCase())
-//     ));
-//   };
-//   const handleOptionChangeAndClose = (event) => {
-//     onOptionChange(event);
-//     setAnchorEl(event.currentTarget);
-//     setSearchTerm('');
-//     setFilteredOptions(options);
-//     setIsFocused(true);
-//     handleCloseMenu();
-//   };
-
-//   return (
-//     <Box>
-//       <Button
-//         sx={{
-//           fontSize: '0.85rem',
-//           color: '#000',
-//           textTransform: 'none',
-//           display: 'flex',
-//           flexDirection: 'column',
-//           alignItems: 'start',
-//           justifyContent: "center",
-//           border: `2px solid ${isFocused ? '#FFBF00' : 'transparent'}`,
-//           borderRadius: '8px',
-//           transition: 'border-color 0.3s ease-in-out',
-//           fontFamily: '"Inter", sans-serif',
-//           margin: "5px 3px",
-//           '&:hover': {
-//             bgcolor: '#f0f0f0',
-//           },
-//         }}
-//         onClick={handleOpenMenu}
-//       >
-//         <Typography variant="body2" sx={{ fontFamily: '"Inter", sans-serif', fontSize: '0.80rem' }}>{filter}</Typography>
-//         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: "start", color: grey[500], fontFamily: '"Inter", sans-serif' }}>
-//           <Box sx={{ fontSize: '13px', color: '#999999', fontFamily: '"Inter", sans-serif' }}>
-//             {selectedOption || 'All'}
-//           </Box>
-//           <KeyboardArrowDownIcon sx={{ fontSize: "16px" }} />
-//         </Box>
-//       </Button>
-
-//       <Menu
-//         anchorEl={anchorEl}
-//         open={Boolean(anchorEl)}
-//         onClose={handleCloseMenu}
-//         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-//         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-//       >
-//         <RadioGroup
-//           value={selectedOption}
-//           onChange={handleOptionChangeAndClose}
-//           sx={{ padding: '8px 15px', borderRadius: 2, width: "200px", fontFamily: '"Inter", sans-serif' }}
-//         >
-//           {searchEnabled && (
-//             <Search>
-//               <StyledInputBase
-//                 placeholder={`Search ${filter.toLowerCase()}`}
-//                 onChange={handleSearchChange}
-//                 value={searchTerm}
-//                 variant="outlined"
-//                 size="small"
-//                 InputProps={{
-//                   startAdornment: (
-//                     <InputAdornment position="start">
-//                       <SearchIcon style={{ fontSize: '20px', color: '#777', fontFamily: '"Inter", sans-serif' }} />
-//                     </InputAdornment>
-//                   ),
-//                 }}
-//                 fullWidth
-//               />
-//             </Search>
-//           )}
-
-//           <Box sx={{ textAlign: "start" }}>
-//             <FormControlLabel
-//               value="All"
-//               control={<CustomRadio />}
-//               label="All"
-//               sx={{
-//                 fontFamily: '"Inter", sans-serif',
-//                 '.MuiFormControlLabel-label': { fontSize: '0.85rem' },
-//                 transition: 'all 0.2s ease-in-out',
-//                 '&:hover': {
-//                   backgroundColor: '#f2f2f2',
-//                   borderRadius: '8px',
-//                   cursor: 'pointer',
-//                   width: "100%",
-//                 },
-//               }}
-//             />
-//             <Divider />
-//           </Box>
-
-//           {filteredOptions.map((option, idx) => (
-//             <FormControlLabel
-//               key={idx}
-//               value={option}
-//               control={<CustomRadio />}
-//               label={option}
-//               sx={{
-//                 fontFamily: '"Inter", sans-serif',
-//                 '.MuiFormControlLabel-label': { fontSize: '0.85rem' },
-//                 transition: 'all 0.2s ease-in-out',
-//                 '&:hover': {
-//                   backgroundColor: '#f2f2f2',
-//                   borderRadius: '8px',
-//                   cursor: 'pointer',
-//                 },
-//               }}
-//             />
-//           ))}
-//         </RadioGroup>
-//       </Menu>
-//     </Box>
-//   );
-// };
-
-// Date Filter
-
 const FilterDropdown = ({
   filter,
   options,
   selectedOption,
   onOptionChange,
   searchEnabled,
+  // children,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -264,7 +127,6 @@ const FilterDropdown = ({
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          // border: `2px solid ${isFocused ? '#FFBF00' : 'transparent'}`,
           border: `2px solid ${isSelected || isFocused ? '#FFBF00' : 'transparent'
             }`,
           borderRadius: '8px',
@@ -303,6 +165,7 @@ const FilterDropdown = ({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
+        {/* {children} */}
         <RadioGroup
           value={selectedOption}
           onChange={handleOptionChangeAndClose}
@@ -342,8 +205,7 @@ const FilterDropdown = ({
             }}
           />
           <Divider />
-
-          {filteredOptions.map((option, idx) => (
+          {filteredOptions?.map((option, idx) => (
             <FormControlLabel
               key={idx}
               value={option}
@@ -381,30 +243,29 @@ const Dates = () => {
       options={optionsAlliances}
       selectedOption={selectedOption}
       onOptionChange={handleOptionChange}
+
     />
   );
 };
 
-// price filter
 const Prices = () => {
-  const [selectedOption, setSelectedOption] = useState('All');
-  const optionsAlliances = [];
+  const [priceRange, setPriceRange] = useState([0, 1500]);
 
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
+  const handlePriceChange = (event, newValue) => {
+    setPriceRange(newValue);
   };
 
   return (
-    <FilterDropdown
-      filter="Prices"
-      options={optionsAlliances}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-    />
+    <FilterDropdown filter="Price">
+      <CustomSlider value={priceRange} onChange={handlePriceChange} />
+      <Typography mt={1}>
+        Range: ${priceRange[0]} - ${priceRange[1]}
+      </Typography>
+    </FilterDropdown>
   );
 };
 
-// Alliances Filter Component
+
 const AlliancesFilter = () => {
   const [selectedOption, setSelectedOption] = useState('All');
   const optionsAlliances = ['Data', 'Oneworld', 'SkyTeam', 'Star Alliance'];
@@ -536,13 +397,14 @@ const RideFilter = () => {
         fontSize={2}
       >
         <Dates />
-        <Prices />
+        <PriceFilter />
         <AlliancesFilter />
         <AirlinesFilter />
         <ClassesFilter />
         <AircraftFilter />
-        <Distance />
-        <Duration />
+        <DistanceFilter />
+        <DurationFilter />
+
       </Box>
     </Box>
   );
