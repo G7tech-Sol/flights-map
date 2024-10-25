@@ -8,8 +8,10 @@ import {
   Box,
   Typography,
   Avatar,
+  border,
+  Icon,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import RoomIcon from "@mui/icons-material/Room";
 import AdjustOutlinedIcon from "@mui/icons-material/AdjustOutlined";
@@ -19,17 +21,22 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import { PiUserCircleThin } from "react-icons/pi";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
+// import { VscArrowSwap } from "react-icons/vsc";
+// import { MdOutlineSwapHoriz } from "react-icons/md";
+import { FaExchangeAlt } from "react-icons/fa";
 
-export default function Header() {
+const Header = () => {
   const fromPlaceholder = "From"; // Placeholder for the first TextField
   const toPlaceholder = "To"; // Placeholder for the second TextField
+  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered2, setIsHovered2] = useState(false);
 
   return (
     <AppBar position="static" color="transparent" elevation={0} sx={{ padding: "0px 10px" }}>
       <Box
         sx={{ display: "flex", justifyContent: "space-between", fontFamily: '"Inter", sans-serif' }}
       >
-        <Box sx={{ flexGrow: 0 }}>
+        <Box sx={{ flexGrow: 0, marginTop: "22px", marginLeft: "15px" }}>
           <h2
             sx={{
               fontFamily: '"Inter", sans-serif',
@@ -41,8 +48,9 @@ export default function Header() {
 
         <Box
           sx={{
-            pt: "8px",
-            paddingRight: "35px",
+            paddingRight: "70px",
+            paddingBottom: "8px",
+            paddingTop: "12px",
           }}
         >
           <TextField
@@ -54,6 +62,8 @@ export default function Header() {
               width: "272px",
               fontFamily: '"Inter", sans-serif',
               fontWeight: "600",
+              color: "#1c1d2e",
+
               "&::placeholder": {
                 color: "gray",
                 fontWeight: "700",
@@ -89,34 +99,54 @@ export default function Header() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <AdjustOutlinedIcon sx={{ fontSize: "13px", lineHeight: "16px" }} />
+                  <AdjustOutlinedIcon
+                    sx={{ fontSize: "15px", lineHeight: "16px", fontWeight: "bold" }}
+                  />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
-                  <Image src="/VectorA.png" alt="Flag" height={25} width={25} />
+                  <Box
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      transition: "filter 0.3s ease",
+                      filter: isHovered ? "brightness(0) saturate(100%)" : "none",
+                    }}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                  >
+                    <Image src="/VectorA.png" alt="Flag" height={28} width={28} />
+                  </Box>
                 </InputAdornment>
               ),
             }}
           />
 
-          <IconButton
+          <Icon
             sx={{
+              border: "1px solid rgba(0, 0, 0, 0.1)",
+
               height: "38px",
-              width: "60px",
+              width: "40px",
+              my: 0.7,
+              mx: 1.5,
+              px: 0.5,
+              py: 1.3,
+              color: "#bbb",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontSize: "15px",
             }}
           >
-            <SwapHorizIcon
+            <FaExchangeAlt
               sx={{
                 border: "1px solid rgba(0, 0, 0, 0.1)",
-                mt: 1,
-                p: 0.8,
-                height: "20px",
-                width: "25px",
-                borderRadius: 1,
+                color: "#bbb",
               }}
             />
-          </IconButton>
+          </Icon>
 
           <TextField
             variant="outlined"
@@ -127,6 +157,8 @@ export default function Header() {
               fontWeight: "600",
               width: "272px",
               fontFamily: '"Inter", sans-serif',
+              color: "#1c1d2e",
+              cursor: "pointer",
               "&::placeholder": {
                 color: "gray",
                 fontWeight: "700",
@@ -162,19 +194,31 @@ export default function Header() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <RoomIcon sx={{ fontSize: "13px", lineHeight: "16px" }} />
+                  <RoomIcon sx={{ fontSize: "13px", lineHeight: "16px", fontWeight: "bold" }} />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
-                  <Image src="/VectorB.png" alt="Flag" height={25} width={25} />
+                  <Box
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      transition: "filter 0.3s ease",
+                      filter: isHovered2 ? "brightness(0) saturate(100%)" : "none",
+                    }}
+                    onMouseEnter={() => setIsHovered2(true)}
+                    onMouseLeave={() => setIsHovered2(false)}
+                  >
+                    <Image src="/VectorB.png" alt="Flag" height={28} width={28} />
+                  </Box>
                 </InputAdornment>
               ),
             }}
           />
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", mt: "4px" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", mt: "10px" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button variant="text" size="small" sx={{ textTransform: "none" }}>
               <Box display="flex" alignItems="center" gap={1} marginRight={1}>
@@ -187,6 +231,7 @@ export default function Header() {
                     fontWeight: "600",
                     fontSize: "14px",
                     fontFamily: '"Inter", sans-serif',
+                    color: "#000",
                   }}
                 >
                   EN
@@ -196,7 +241,7 @@ export default function Header() {
 
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
               <Avatar sx={{ width: 50, height: 50, bgcolor: "white" }}>
-                <PiUserCircleThin style={{ width: "45px", height: "45px" }} color="#cccccc" />
+                <PiUserCircleThin style={{ width: "45px", height: "45px" }} color="#bbb" />
               </Avatar>
             </Box>
 
@@ -205,7 +250,7 @@ export default function Header() {
                 padding: 0,
               }}
             >
-              <PiDotsThreeVerticalBold style={{ width: 35, height: 35 }} />
+              <PiDotsThreeVerticalBold style={{ width: 35, height: 35, color: "#000" }} />
             </IconButton>
           </Box>
           <Box>
@@ -216,8 +261,8 @@ export default function Header() {
                 textAlign: "center",
                 ml: "32px",
                 fontSize: "9px",
-                color: "#cccccc",
-                marginTop: "-5px",
+                color: "#757575",
+                marginTop: "-4px",
                 fontFamily: '"Inter", sans-serif',
               }}
             >
@@ -228,4 +273,6 @@ export default function Header() {
       </Box>
     </AppBar>
   );
-}
+};
+
+export default Header;

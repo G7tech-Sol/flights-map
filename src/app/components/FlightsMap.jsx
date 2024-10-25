@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { point } from "@turf/helpers";
+import { distance } from "@turf/turf";
 import greatCircle from "@turf/great-circle";
 import { Autocomplete, TextField, Grid, Box, Button } from "@mui/material";
 
@@ -36,11 +37,14 @@ const FlightsMap = () => {
   const [mapInstance, setMapInstance] = useState(null);
   const [source, setSource] = useState(null);
   const [destination, setDestination] = useState(null);
+  const [filteredDestinations, setFilteredDestinations] = useState(Object.keys(countryCoordinates));
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      // style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      style: "https://demotiles.maplibre.org/style.json",
       center: [23, 45],
       zoom: 2,
     });
@@ -86,27 +90,49 @@ const FlightsMap = () => {
   const createCurvedLine = (start, end) => {
     const startPoint = point(start);
     const endPoint = point(end);
+
+    // const distanceValue = distance(startPoint, endPoint, { units: "kilometers" });
+    // console.log("Distance:", distanceValue);
+
     const curvedLine = greatCircle(startPoint, endPoint, { npoints: 100 });
     return curvedLine.geometry.coordinates;
   };
 
   const handleSourceChange = (event, newValue) => {
     setSource(newValue);
+    setDestination(null);
+    setError(null);
+
+    if (newValue) {
+      const validDestinations = Object.keys(countryCoordinates).filter(
+        (country) => country !== newValue
+      );
+      setFilteredDestinations(validDestinations);
+    } else {
+      setFilteredDestinations(Object.keys(countryCoordinates));
+    }
   };
 
   const handleDestinationChange = (event, newValue) => {
     setDestination(newValue);
+    setError(null);
   };
 
   const handleSubmit = () => {
-    if (!source || !destination) return;
+    if (!source || !destination) {
+      setError("Please select both a source and a destination.");
+      return;
+    }
 
     const startCoords = countryCoordinates[source];
     const endCoords = countryCoordinates[destination];
+    const routeCoordinates = createCurvedLine(startCoords, endCoords);
 
-    if (startCoords && endCoords) {
-      const routeCoordinates = createCurvedLine(startCoords, endCoords);
+    const isValidRoute =
+      routeCoordinates.length > 5 &&
+      routeCoordinates.every((coord) => !isNaN(coord[0]) && !isNaN(coord[1]));
 
+    if (isValidRoute) {
       const flightRoute = {
         type: "Feature",
         geometry: {
@@ -141,6 +167,21 @@ const FlightsMap = () => {
           "line-width": 2,
         },
       });
+
+      const bounds = routeCoordinates.reduce((bounds, coord) => {
+        return bounds.extend(coord);
+      }, new maplibregl.LngLatBounds().extend(routeCoordinates[0]));
+
+      mapInstance.fitBounds(bounds, { padding: 80 });
+
+      setError(null);
+    } else {
+      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+        mapInstance.removeLayer("dynamic-flight-route-layer");
+        mapInstance.removeSource("dynamic-flight-route");
+      }
+
+      setError("No valid route found between the selected source and destination.");
     }
   };
 
@@ -158,7 +199,7 @@ const FlightsMap = () => {
 
         <Grid item xs={12} md={5}>
           <Autocomplete
-            options={Object.keys(countryCoordinates)}
+            options={filteredDestinations}
             value={destination}
             onChange={handleDestinationChange}
             renderInput={(params) => <TextField {...params} label="Select Destination" />}
@@ -175,6 +216,12 @@ const FlightsMap = () => {
             Show Route
           </Button>
         </Grid>
+
+        {error && (
+          <Grid item xs={12}>
+            <Box color="red">{error}</Box>
+          </Grid>
+        )}
       </Grid>
 
       <Box
