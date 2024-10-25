@@ -26,8 +26,6 @@ import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { FaExchangeAlt } from "react-icons/fa";
 
 const Header = () => {
-  const fromPlaceholder = "From"; // Placeholder for the first TextField
-  const toPlaceholder = "To"; // Placeholder for the second TextField
   const [isHovered, setIsHovered] = useState(false);
   const [isHovered2, setIsHovered2] = useState(false);
 
@@ -56,7 +54,7 @@ const Header = () => {
           <TextField
             variant="outlined"
             size="small"
-            placeholder={fromPlaceholder}
+            placeholder="From"
             sx={{
               fontSize: "15px",
               width: "272px",
@@ -65,7 +63,7 @@ const Header = () => {
               color: "#1c1d2e",
 
               "&::placeholder": {
-                color: "gray",
+                color: "red",
                 fontWeight: "700",
                 opacity: 1,
               },
@@ -95,6 +93,15 @@ const Header = () => {
                 paddingLeft: "6px",
                 height: "70%",
               },
+              "& .MuiOutlinedInput-input": {
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: "500",
+                "&::placeholder": {
+                  color: "#757575",
+                  opacity: 1,
+                  fontWeight: "500",
+                },
+              },
             }}
             InputProps={{
               startAdornment: (
@@ -117,7 +124,7 @@ const Header = () => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                   >
-                    <Image src="/VectorA.png" alt="Flag" height={28} width={28} />
+                    <Image src="/assets/VectorA.png" alt="A" height={28} width={28} />
                   </Box>
                 </InputAdornment>
               ),
@@ -151,7 +158,7 @@ const Header = () => {
           <TextField
             variant="outlined"
             size="small"
-            placeholder={toPlaceholder}
+            placeholder="To"
             sx={{
               fontSize: "15px",
               fontWeight: "600",
@@ -190,6 +197,15 @@ const Header = () => {
                 paddingLeft: "6px",
                 height: "70%",
               },
+              "& .MuiOutlinedInput-input": {
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: "500",
+                "&::placeholder": {
+                  color: "#757575",
+                  opacity: 1,
+                  fontWeight: "500",
+                },
+              },
             }}
             InputProps={{
               startAdornment: (
@@ -210,7 +226,7 @@ const Header = () => {
                     onMouseEnter={() => setIsHovered2(true)}
                     onMouseLeave={() => setIsHovered2(false)}
                   >
-                    <Image src="/VectorB.png" alt="Flag" height={28} width={28} />
+                    <Image src="/assets/VectorB.png" alt="B" height={28} width={28} />
                   </Box>
                 </InputAdornment>
               ),
@@ -222,7 +238,7 @@ const Header = () => {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button variant="text" size="small" sx={{ textTransform: "none" }}>
               <Box display="flex" alignItems="center" gap={1} marginRight={1}>
-                <Image src="/Flag.png" alt="Flag" height={14} width={20} />
+                <Image src="/assets/Flag.png" alt="Flag" height={14} width={20} />
                 <Typography
                   variant="body1"
                   sx={{

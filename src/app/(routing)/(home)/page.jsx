@@ -7,7 +7,7 @@ import Header from "@/app/components/Header";
 const page = () => {
   return (
     <>
-      {/* <Header /> */}
+      <Header />
       <FlightsMap />
     </>
   );

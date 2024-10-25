@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { point } from "@turf/helpers";
-import { distance } from "@turf/turf";
 import greatCircle from "@turf/great-circle";
-import { Autocomplete, TextField, Grid, Box, Button } from "@mui/material";
+import { Autocomplete, TextField, Grid, Box } from "@mui/material";
 
 const countryCoordinates = {
   Germany: [10.4515, 51.1657],
@@ -43,57 +42,65 @@ const FlightsMap = () => {
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      // style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       style: "https://demotiles.maplibre.org/style.json",
-      center: [23, 45],
+      center: [30, 20],
       zoom: 2,
     });
 
     map.on("load", () => {
       setMapInstance(map);
 
-      const allCountryPoints = Object.values(countryCoordinates).map((coordinates) => ({
+      const allCountryPoints = Object.keys(countryCoordinates).map((country) => ({
         type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates,
-        },
-        properties: {},
+        geometry: { type: "Point", coordinates: countryCoordinates[country] },
+        properties: { name: country },
       }));
 
-      const countryPointsGeoJson = {
-        type: "FeatureCollection",
-        features: allCountryPoints,
-      };
+      const countryPointsGeoJson = { type: "FeatureCollection", features: allCountryPoints };
 
-      map.addSource("country-points", {
-        type: "geojson",
-        data: countryPointsGeoJson,
-      });
+      map.addSource("country-points", { type: "geojson", data: countryPointsGeoJson });
 
       map.addLayer({
         id: "country-circles",
         type: "circle",
         source: "country-points",
-        paint: {
-          "circle-radius": 6,
-          "circle-color": "blue",
-        },
+        paint: { "circle-radius": 6, "circle-color": "blue" },
+      });
+
+      let sourceSetLocally = false;
+
+      map.on("click", "country-circles", (e) => {
+        const countryName = e.features[0].properties.name;
+
+        if (!sourceSetLocally) {
+          handleSourceChange(e, countryName);
+          sourceSetLocally = true;
+        } else {
+          handleDestinationChange(e, countryName);
+        }
+      });
+
+      map.on("mouseenter", "country-circles", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+
+      map.on("mouseleave", "country-circles", () => {
+        map.getCanvas().style.cursor = "";
       });
     });
 
-    return () => {
-      map.remove();
-    };
+    return () => map.remove();
   }, []);
+
+  useEffect(() => {
+    if (source && destination) {
+      handleSubmit();
+    }
+  }, [source, destination]);
 
   const createCurvedLine = (start, end) => {
     const startPoint = point(start);
     const endPoint = point(end);
-
-    // const distanceValue = distance(startPoint, endPoint, { units: "kilometers" });
-    // console.log("Distance:", distanceValue);
-
     const curvedLine = greatCircle(startPoint, endPoint, { npoints: 100 });
     return curvedLine.geometry.coordinates;
   };
@@ -119,13 +126,19 @@ const FlightsMap = () => {
   };
 
   const handleSubmit = () => {
-    if (!source || !destination) {
+    const currentSource = source;
+    const currentDestination = destination;
+
+    console.log("Source:", currentSource);
+    console.log("Dest:", currentDestination);
+
+    if (!currentSource || !currentDestination) {
       setError("Please select both a source and a destination.");
       return;
     }
 
-    const startCoords = countryCoordinates[source];
-    const endCoords = countryCoordinates[destination];
+    const startCoords = countryCoordinates[currentSource];
+    const endCoords = countryCoordinates[currentDestination];
     const routeCoordinates = createCurvedLine(startCoords, endCoords);
 
     const isValidRoute =
@@ -173,64 +186,58 @@ const FlightsMap = () => {
       }, new maplibregl.LngLatBounds().extend(routeCoordinates[0]));
 
       mapInstance.fitBounds(bounds, { padding: 80 });
-
       setError(null);
     } else {
       if (mapInstance.getLayer("dynamic-flight-route-layer")) {
         mapInstance.removeLayer("dynamic-flight-route-layer");
         mapInstance.removeSource("dynamic-flight-route");
       }
-
       setError("No valid route found between the selected source and destination.");
     }
   };
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={5}>
-          <Autocomplete
-            options={Object.keys(countryCoordinates)}
-            value={source}
-            onChange={handleSourceChange}
-            renderInput={(params) => <TextField {...params} label="Select Source" />}
-          />
-        </Grid>
+    <Box sx={{ height: "calc(100vh - 73px)", display: "flex", paddingX: 2 }}>
+      <Grid container sx={{ height: "100%", flex: 1 }}>
+        <Grid item xs={12} md={3} sx={{ padding: 2 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Autocomplete
+                options={Object.keys(countryCoordinates)}
+                value={source}
+                onChange={handleSourceChange}
+                renderInput={(params) => <TextField {...params} label="Select Source" />}
+              />
+            </Grid>
 
-        <Grid item xs={12} md={5}>
-          <Autocomplete
-            options={filteredDestinations}
-            value={destination}
-            onChange={handleDestinationChange}
-            renderInput={(params) => <TextField {...params} label="Select Destination" />}
-          />
-        </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                options={filteredDestinations}
+                value={destination}
+                onChange={handleDestinationChange}
+                renderInput={(params) => <TextField {...params} label="Select Destination" />}
+              />
+            </Grid>
 
-        <Grid item xs={12} md={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            disabled={!source || !destination}
-          >
-            Show Route
-          </Button>
-        </Grid>
-
-        {error && (
-          <Grid item xs={12}>
-            <Box color="red">{error}</Box>
+            {error && (
+              <Grid item xs={12}>
+                <Box color="red">{error}</Box>
+              </Grid>
+            )}
           </Grid>
-        )}
-      </Grid>
+        </Grid>
 
-      <Box
-        ref={mapContainer}
-        sx={{
-          height: "100%",
-          width: "100%",
-        }}
-      />
+        <Grid item xs={12} md={9} sx={{ position: "relative" }}>
+          <Box
+            ref={mapContainer}
+            sx={{
+              borderRadius: "10px",
+              height: "100%",
+              width: "100%",
+            }}
+          />
+        </Grid>
+      </Grid>
     </Box>
   );
 };
