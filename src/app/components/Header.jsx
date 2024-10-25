@@ -8,11 +8,9 @@ import {
   Box,
   Typography,
   Avatar,
-  border,
   Icon,
 } from "@mui/material";
 import React, { useState } from "react";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import RoomIcon from "@mui/icons-material/Room";
 import AdjustOutlinedIcon from "@mui/icons-material/AdjustOutlined";
 import Image from "next/image";
@@ -21,8 +19,6 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import { PiUserCircleThin } from "react-icons/pi";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
-// import { VscArrowSwap } from "react-icons/vsc";
-// import { MdOutlineSwapHoriz } from "react-icons/md";
 import { FaExchangeAlt } from "react-icons/fa";
 
 const Header = () => {

@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
 import FlightsMap from "@/app/components/FlightsMap";
 import Header from "@/app/components/Header";
 
-const page = () => {
+const Home = () => {
   return (
     <>
       <Header />
@@ -13,4 +12,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Home;
