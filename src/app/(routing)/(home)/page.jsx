@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Box } from "@mui/material";
 import FlightsMap from "@/app/components/FlightsMap";
 import SearchBar from "@/app/components/SearchBar";
+import RideFilter from "@/app/components/RideFilter";
 
 const Home = () => {
   const [source, setSource] = useState(null);
@@ -17,6 +18,7 @@ const Home = () => {
         destination={destination}
         setDestination={setDestination}
       />
+      <RideFilter />
 
       <FlightsMap
         source={source}

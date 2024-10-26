@@ -10,6 +10,7 @@ import {
   Avatar,
   Autocomplete,
   Icon,
+  Divider,
 } from "@mui/material";
 import React, { useState } from "react";
 import AdjustOutlinedIcon from "@mui/icons-material/AdjustOutlined";
@@ -361,6 +362,7 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
           </Box>
         </Box>
       </Box>
+      <Divider sx={{ borderColor: "#E0E0E0", marginTop: "5px" }} />
     </AppBar>
   );
 };

@@ -196,7 +196,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   };
 
   return (
-    <Box sx={{ height: "calc(100vh - 75px)", display: "flex", padding: 2, paddingBottom: 0 }}>
+    <Box sx={{ height: "calc(100vh - 75px)", display: "flex", paddingX: 2, paddingY: 0 }}>
       <Grid container spacing={2} sx={{ height: "100%", flex: 1 }}>
         <Grid item xs={12} md={3}>
           <Grid container spacing={2} sx={{ padding: "16px 0px 0px 16px" }}>
