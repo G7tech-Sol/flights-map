@@ -35,7 +35,6 @@ const CustomSlider = (props) => (
   />
 );
 
-// Filter Dropdown Component
 const FilterDropdown = ({ filter, selectedOption, children, buttonLabel }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -107,7 +106,6 @@ const FilterDropdown = ({ filter, selectedOption, children, buttonLabel }) => {
 
 const Duration = () => {
   const [priceRange, setPriceRange] = useState([0, 1500]);
-  // const [tripType, setTripType] = useState('One way');
   const [allRange, setAllRange] = useState(false);
 
   const handlePriceChange = (event, newValue) => {

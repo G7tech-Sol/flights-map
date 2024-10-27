@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -17,7 +18,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 
-// Styled Components
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -116,7 +116,7 @@ const FilterDropdown = ({
           },
         }}
         MenuListProps={{
-          disablePadding: true, // Removes padding around <ul>
+          disablePadding: true,
         }}
       >
         <Box sx={{ padding: "15px 12px", width: "280px" }}>

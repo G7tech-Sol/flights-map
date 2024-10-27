@@ -28,7 +28,6 @@ import AirCraftFilter from "./AirCraftFilter";
 import AirlinesFilter from "./AirlinesFilter";
 import ClassFilter from "./ClassFilter";
 
-// Styled Components
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -59,7 +58,7 @@ const StyledInputBase = styled(TextField)(({ theme }) => ({
     },
   },
 }));
-// custom price dropdown range
+
 const CustomSlider = (props) => (
   <Slider
     {...props}
@@ -167,13 +166,7 @@ const FilterDropdown = ({
         </Box>
       </Button>
 
-      <Box
-        sx={
-          {
-            // borderRadius: "8px"
-          }
-        }
-      >
+      <Box>
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -183,12 +176,10 @@ const FilterDropdown = ({
           sx={{
             overflow: "visible",
             marginTop: "5px",
-            // marginLeft: "5rem",
             borderRadius: "8px",
             padding: "10px 18px",
           }}
         >
-          {/* {children} */}
           <RadioGroup
             value={selectedOption}
             onChange={handleOptionChangeAndClose}
@@ -327,7 +318,6 @@ const AlliancesFilter = () => {
 //   );
 // };
 
-// Classes Filter Component
 const ClassesFilter = () => {
   const [selectedOption, setSelectedOption] = useState("All");
   const optionsClasses = ["Economy", "Premium Economy", "Business Class", "First Class"];
@@ -346,7 +336,6 @@ const ClassesFilter = () => {
   );
 };
 
-// Aircraft Filter Component
 const AircraftFilter = () => {
   const [selectedOption, setSelectedOption] = useState("All");
   const optionsAircraft = ["Aircraft A", "Aircraft B", "Aircraft C"];
@@ -366,7 +355,6 @@ const AircraftFilter = () => {
   );
 };
 
-// RideFilter Main Component
 const RideFilter = () => {
   return (
     <Box

@@ -81,7 +81,6 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
             options={Object.keys(countryCoordinates)}
             value={source}
             onChange={(event, newValue) => setSource(newValue)}
-            // freeSolo
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -137,7 +136,7 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                   },
                 }}
                 InputProps={{
-                  ...params.InputProps, // Spread params to include necessary props for Autocomplete
+                  ...params.InputProps,
                   startAdornment: (
                     <InputAdornment position="start">
                       <AdjustOutlinedIcon
@@ -208,7 +207,6 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
             options={filteredDestinations}
             value={destination}
             onChange={(event, newValue) => setDestination(newValue)}
-            // freeSolo
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -264,7 +262,7 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                   },
                 }}
                 InputProps={{
-                  ...params.InputProps, // Spread params to include necessary props for Autocomplete
+                  ...params.InputProps,
                   startAdornment: (
                     <InputAdornment position="start">
                       <AdjustOutlinedIcon

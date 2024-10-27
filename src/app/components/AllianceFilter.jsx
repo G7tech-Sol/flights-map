@@ -1,5 +1,5 @@
-// AlliancesFilter.js
 "use client";
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -11,14 +11,12 @@ import {
   Divider,
   Radio,
   TextField,
-  InputAdornment,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 
-// Styled Components
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -112,12 +110,12 @@ const FilterDropdown = ({
         transformOrigin={{ vertical: "top", horizontal: "center" }}
         PaperProps={{
           sx: {
-            borderRadius: "8px", // Adjust border radius here
-            overflow: "hidden", // Prevents clipping of border-radius
+            borderRadius: "8px",
+            overflow: "hidden",
           },
         }}
         MenuListProps={{
-          disablePadding: true, // Removes padding around <ul>
+          disablePadding: true,
         }}
       >
         <RadioGroup

@@ -5,7 +5,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { grey } from "@mui/material/colors";
 import { TrainSharp } from "@mui/icons-material";
 
-// Styled Components
 const CustomSlider = (props) => (
   <Slider
     {...props}
@@ -36,7 +35,6 @@ const CustomSlider = (props) => (
   />
 );
 
-// Filter Dropdown Component
 const FilterDropdown = ({ filter, selectedOption, children, buttonLabel }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -106,7 +104,6 @@ const FilterDropdown = ({ filter, selectedOption, children, buttonLabel }) => {
   );
 };
 
-// Trip Type Buttons Component
 const TripTypeButtons = ({ tripType, setTripType }) => (
   <Box
     sx={{
