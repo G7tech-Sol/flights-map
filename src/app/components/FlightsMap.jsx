@@ -33,6 +33,7 @@ const countryCoordinates = {
 
 const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const mapContainer = useRef(null);
+  const popupRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [error, setError] = useState(null);
   const [hasSubmittedRoute, setHasSubmittedRoute] = useState(false);
@@ -69,6 +70,29 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
           "circle-color": "#007CFF",
           "circle-stroke-color": "#000000",
           "circle-stroke-width": 1,
+        },
+      });
+
+      map.addSource("source-point", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              geometry: { type: "Point", coordinates: [0, 0] },
+            },
+          ],
+        },
+      });
+
+      map.addLayer({
+        id: "source-point-layer",
+        type: "circle",
+        source: "source-point",
+        paint: {
+          "circle-radius": 8,
+          "circle-color": "#007CFF",
         },
       });
 
@@ -115,6 +139,52 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       handleSubmit();
     }
   }, [source, destination]);
+
+  useEffect(() => {
+    if (mapInstance && source) {
+      const updateSourcePoint = () => {
+        const coords = countryCoordinates[source];
+        if (coords) {
+          mapInstance.getSource("source-point").setData({
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                geometry: { type: "Point", coordinates: coords },
+              },
+            ],
+          });
+
+          if (popupRef.current) {
+            popupRef.current.remove();
+          }
+
+          const popup = new maplibregl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+            offset: 15,
+          });
+
+          popup
+            .setLngLat(coords)
+            .setHTML(`<div><strong>${source}</strong></div>`)
+            .addTo(mapInstance);
+
+          popupRef.current = popup;
+        }
+      };
+
+      updateSourcePoint();
+
+      const animateSourcePoint = () => {
+        const radius = Math.abs(Math.sin(Date.now() / 500)) * 8 + 8;
+        mapInstance.setPaintProperty("source-point-layer", "circle-radius", radius);
+        requestAnimationFrame(animateSourcePoint);
+      };
+
+      animateSourcePoint();
+    }
+  }, [mapInstance, source]);
 
   const createCurvedLine = (start, end) => {
     const startPoint = point(start);
@@ -258,7 +328,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} md={9} sx={{ position: "relative" }}>
+        <Grid item xs={12} md={9}>
           <Box
             ref={mapContainer}
             sx={{
