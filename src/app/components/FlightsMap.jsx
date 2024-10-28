@@ -307,9 +307,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       setSource(null);
       setDestination(null);
       sourceSetLocally.current = false;
-      // setError(
-      //   "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
-      // );
+      setError(null);
     }
   }, [source, destination, mapInstance]);
 
@@ -374,13 +372,27 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       setError(null);
       setHasSubmittedRoute(true);
     } else {
-      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
-        mapInstance.removeLayer("dynamic-flight-route-layer");
-        mapInstance.removeSource("dynamic-flight-route");
+      if (mapInstance) {
+        if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+          mapInstance.removeLayer("dynamic-flight-route-layer");
+          mapInstance.removeSource("dynamic-flight-route");
+        }
+        if (mapInstance.getLayer("highlighted-route-layer")) {
+          mapInstance.removeLayer("highlighted-route-layer");
+          mapInstance.removeSource("highlighted-route-source");
+        }
+        if (mapInstance.getLayer("all-routes-layer")) {
+          mapInstance.removeLayer("all-routes-layer");
+          mapInstance.removeSource("all-routes-source");
+        }
       }
-      // setError(
-      //   "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
-      // );
+      setSource(null);
+      setDestination(null);
+      setAllRoutes([]);
+      setError(
+        "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
+      );
+      sourceSetLocally.current = false;
     }
   };
 
