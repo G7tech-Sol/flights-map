@@ -37,8 +37,9 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const [mapInstance, setMapInstance] = useState(null);
   const [error, setError] = useState(null);
   const [hasSubmittedRoute, setHasSubmittedRoute] = useState(false);
-
-  let sourceSetLocally = false;
+  const [allRoutes, setAllRoutes] = useState([]);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(null);
+  let sourceSetLocally = useRef(false);
 
   useEffect(() => {
     const map = new maplibregl.Map({
@@ -120,13 +121,11 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
 
       map.on("click", "country-circles", (e) => {
         const countryName = e.features[0].properties.name;
-
-        if (!sourceSetLocally) {
+        if (!sourceSetLocally.current) {
           handleSourceChange(countryName);
-          sourceSetLocally = true;
+          sourceSetLocally.current = true;
         } else {
           handleDestinationChange(countryName);
-          sourceSetLocally = false;
         }
       });
     });
@@ -135,56 +134,137 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   }, []);
 
   useEffect(() => {
-    if (source && destination) {
+    if (source && !destination) {
+      calculateAllRoutes(source);
+    } else if (source && destination) {
       handleSubmit();
     }
   }, [source, destination]);
 
   useEffect(() => {
     if (mapInstance && source) {
-      const updateSourcePoint = () => {
-        const coords = countryCoordinates[source];
-        if (coords) {
-          mapInstance.getSource("source-point").setData({
-            type: "FeatureCollection",
-            features: [
-              {
-                type: "Feature",
-                geometry: { type: "Point", coordinates: coords },
-              },
-            ],
-          });
-
-          if (popupRef.current) {
-            popupRef.current.remove();
-          }
-
-          const popup = new maplibregl.Popup({
-            closeButton: false,
-            closeOnClick: false,
-            offset: 15,
-          });
-
-          popup
-            .setLngLat(coords)
-            .setHTML(`<div><strong>${source}</strong></div>`)
-            .addTo(mapInstance);
-
-          popupRef.current = popup;
-        }
-      };
-
       updateSourcePoint();
-
-      const animateSourcePoint = () => {
-        const radius = Math.abs(Math.sin(Date.now() / 500)) * 8 + 8;
-        mapInstance.setPaintProperty("source-point-layer", "circle-radius", radius);
-        requestAnimationFrame(animateSourcePoint);
-      };
-
-      animateSourcePoint();
     }
   }, [mapInstance, source]);
+
+  const calculateAllRoutes = (sourceCountry) => {
+    const sourceCoords = countryCoordinates[sourceCountry];
+    const routes = Object.keys(countryCoordinates)
+      .map((destCountry) => {
+        if (destCountry !== sourceCountry) {
+          const destCoords = countryCoordinates[destCountry];
+          return {
+            type: "Feature",
+            geometry: {
+              type: "LineString",
+              coordinates: createCurvedLine(sourceCoords, destCoords),
+            },
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    setAllRoutes(routes);
+    renderRoutesOnMap(routes);
+  };
+
+  const renderRoutesOnMap = (routes) => {
+    if (mapInstance.getLayer("all-routes-layer")) {
+      mapInstance.removeLayer("all-routes-layer");
+      mapInstance.removeSource("all-routes-source");
+    }
+
+    mapInstance.addSource("all-routes-source", {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: routes,
+      },
+    });
+
+    mapInstance.addLayer({
+      id: "all-routes-layer",
+      type: "line",
+      source: "all-routes-source",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "red",
+        "line-width": 1,
+      },
+    });
+
+    mapInstance.on("click", "all-routes-layer", (e) => {
+      const index = e.features[0].properties.index;
+      setSelectedRouteIndex(index);
+      highlightSelectedRoute(index);
+    });
+  };
+
+  const highlightSelectedRoute = (index) => {
+    if (index !== undefined && index < allRoutes.length) {
+      const selectedRoute = allRoutes[index];
+
+      if (mapInstance.getLayer("highlighted-route-layer")) {
+        mapInstance.removeLayer("highlighted-route-layer");
+        mapInstance.removeSource("highlighted-route-source");
+      }
+
+      mapInstance.addSource("highlighted-route-source", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [selectedRoute],
+        },
+      });
+
+      mapInstance.addLayer({
+        id: "highlighted-route-layer",
+        type: "line",
+        source: "highlighted-route-source",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "red",
+          "line-width": 2,
+        },
+      });
+    }
+  };
+
+  const updateSourcePoint = () => {
+    const coords = countryCoordinates[source];
+    if (coords) {
+      mapInstance.getSource("source-point").setData({
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: coords },
+          },
+        ],
+      });
+
+      if (popupRef.current) {
+        popupRef.current.remove();
+      }
+
+      const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 15,
+      });
+
+      popup.setLngLat(coords).setHTML(`<div><strong>${source}</strong></div>`).addTo(mapInstance);
+
+      popupRef.current = popup;
+    }
+  };
 
   const createCurvedLine = (start, end) => {
     const startPoint = point(start);
@@ -198,12 +278,40 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     setDestination(null);
     setError(null);
     setHasSubmittedRoute(false);
+    setAllRoutes([]);
+    setSelectedRouteIndex(null);
   };
 
   const handleDestinationChange = (newValue) => {
     setDestination(newValue);
     setError(null);
   };
+
+  useEffect(() => {
+    if (source !== null && destination !== null && source === destination) {
+      if (mapInstance) {
+        if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+          mapInstance.removeLayer("dynamic-flight-route-layer");
+          mapInstance.removeSource("dynamic-flight-route");
+        }
+        if (mapInstance.getLayer("highlighted-route-layer")) {
+          mapInstance.removeLayer("highlighted-route-layer");
+          mapInstance.removeSource("highlighted-route-source");
+        }
+        if (mapInstance.getLayer("all-routes-layer")) {
+          mapInstance.removeLayer("all-routes-layer");
+          mapInstance.removeSource("all-routes-source");
+        }
+      }
+
+      setSource(null);
+      setDestination(null);
+      sourceSetLocally.current = false;
+      // setError(
+      //   "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
+      // );
+    }
+  }, [source, destination, mapInstance]);
 
   const handleSubmit = () => {
     const currentSource = source;
@@ -270,9 +378,9 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         mapInstance.removeLayer("dynamic-flight-route-layer");
         mapInstance.removeSource("dynamic-flight-route");
       }
-      setError(
-        "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
-      );
+      // setError(
+      //   "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
+      // );
     }
   };
 
@@ -281,6 +389,8 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       setSource(null);
       setDestination(null);
       setHasSubmittedRoute(false);
+      setAllRoutes([]);
+      setSelectedRouteIndex(null);
     }
   };
 
@@ -336,7 +446,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
               height: "100%",
               width: "100%",
             }}
-            onClick={handleNewPointSelection}
+            // onClick={handleNewPointSelection}
           />
         </Grid>
       </Grid>
