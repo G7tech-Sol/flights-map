@@ -142,9 +142,55 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   }, [source, destination]);
 
   useEffect(() => {
+    const updateSourcePoint = () => {
+      const coords = countryCoordinates[source];
+      if (coords) {
+        mapInstance.getSource("source-point").setData({
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              geometry: { type: "Point", coordinates: coords },
+            },
+          ],
+        });
+
+        if (popupRef.current) {
+          popupRef.current.remove();
+        }
+
+        const popup = new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          offset: 15,
+        });
+
+        popup.setLngLat(coords).setHTML(`<div><strong>${source}</strong></div>`).addTo(mapInstance);
+
+        popupRef.current = popup;
+      }
+    };
+
+    let animationFrameId;
+
+    const animateSourcePoint = () => {
+      if (!source) return;
+
+      const radius = Math.abs(Math.sin(Date.now() / 500)) * 8 + 8;
+      mapInstance.setPaintProperty("source-point-layer", "circle-radius", radius);
+      animationFrameId = requestAnimationFrame(animateSourcePoint);
+    };
+
     if (mapInstance && source) {
       updateSourcePoint();
+      animateSourcePoint();
+    } else if (mapInstance && !source) {
+      mapInstance.setPaintProperty("source-point-layer", "circle-radius", 0);
+      if (popupRef.current) popupRef.current.remove();
+      cancelAnimationFrame(animationFrameId);
     }
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, [mapInstance, source]);
 
   const calculateAllRoutes = (sourceCountry) => {
@@ -192,7 +238,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         "line-cap": "round",
       },
       paint: {
-        "line-color": "red",
+        "line-color": "grey",
         "line-width": 1,
       },
     });
@@ -230,7 +276,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
           "line-cap": "round",
         },
         paint: {
-          "line-color": "red",
+          "line-color": "green",
           "line-width": 2,
         },
       });
@@ -359,7 +405,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
           "line-cap": "round",
         },
         paint: {
-          "line-color": "red",
+          "line-color": "green",
           "line-width": 2,
         },
       });
