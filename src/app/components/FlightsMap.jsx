@@ -64,7 +64,34 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         id: "country-circles",
         type: "circle",
         source: "country-points",
-        paint: { "circle-radius": 6, "circle-color": "blue" },
+        paint: {
+          "circle-radius": 6,
+          "circle-color": "#007CFF",
+          "circle-stroke-color": "#000000",
+          "circle-stroke-width": 1,
+        },
+      });
+
+      const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 15,
+      });
+
+      map.on("mouseenter", "country-circles", (e) => {
+        const countryName = e.features[0].properties.name;
+
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(`<div class="custom-popup"><strong>${countryName}</strong></div>`)
+          .addTo(map);
+
+        map.getCanvas().style.cursor = "pointer";
+      });
+
+      map.on("mouseleave", "country-circles", () => {
+        popup.remove();
+        map.getCanvas().style.cursor = "";
       });
 
       map.on("click", "country-circles", (e) => {
@@ -77,14 +104,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
           handleDestinationChange(countryName);
           sourceSetLocally = false;
         }
-      });
-
-      map.on("mouseenter", "country-circles", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-
-      map.on("mouseleave", "country-circles", () => {
-        map.getCanvas().style.cursor = "";
       });
     });
 
