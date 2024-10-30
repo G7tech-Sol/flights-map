@@ -253,6 +253,22 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     setDestination(null);
     setError(null);
     setHasSubmittedRoute(false);
+
+    console.log("Hi", mapInstance);
+    if (mapInstance) {
+      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+        mapInstance.removeLayer("dynamic-flight-route-layer");
+        mapInstance.removeSource("dynamic-flight-route");
+      }
+      if (mapInstance.getLayer("highlighted-route-layer")) {
+        mapInstance.removeLayer("highlighted-route-layer");
+        mapInstance.removeSource("highlighted-route-source");
+      }
+      if (mapInstance.getLayer("all-routes-layer")) {
+        mapInstance.removeLayer("all-routes-layer");
+        mapInstance.removeSource("all-routes-source");
+      }
+    }
   };
 
   const handleDestinationChange = (newValue) => {
@@ -284,7 +300,13 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     }
   }, [source, destination, mapInstance]);
 
-  const highlightSelectedRoute = () => {
+  const highlightSelectedRoute = async () => {
+    if (mapInstance.getLayer("airplane-layer")) {
+      mapInstance.removeLayer("airplane-layer");
+      mapInstance.removeSource("airplane-point");
+      mapInstance.removeImage("airplane-icon");
+    }
+
     const currentSource = source;
     const currentDestination = destination;
 
@@ -329,6 +351,38 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         paint: {
           "line-color": "green",
           "line-width": 2,
+        },
+      });
+
+      const image = await mapInstance.loadImage("/assets/airplane.png");
+      mapInstance.addImage("airplane-icon", image.data);
+
+      const midpoint = routeCoordinates[Math.floor(routeCoordinates.length / 2)];
+      const airplaneFeature = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: midpoint,
+        },
+      };
+
+      mapInstance.addSource("airplane-point", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [airplaneFeature],
+        },
+      });
+
+      mapInstance.addLayer({
+        id: "airplane-layer",
+        type: "symbol",
+        source: "airplane-point",
+        layout: {
+          "icon-image": "airplane-icon",
+          "icon-size": 0.5,
+          "icon-anchor": "center",
+          "icon-allow-overlap": true,
         },
       });
 
