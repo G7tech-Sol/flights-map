@@ -37,8 +37,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const [mapInstance, setMapInstance] = useState(null);
   const [error, setError] = useState(null);
   const [hasSubmittedRoute, setHasSubmittedRoute] = useState(false);
-  const [allRoutes, setAllRoutes] = useState([]);
-  const [selectedRouteIndex, setSelectedRouteIndex] = useState(null);
   let sourceSetLocally = useRef(false);
 
   useEffect(() => {
@@ -137,7 +135,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     if (source && !destination) {
       calculateAllRoutes(source);
     } else if (source && destination) {
-      handleSubmit();
+      highlightSelectedRoute();
     }
   }, [source, destination]);
 
@@ -211,7 +209,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       })
       .filter(Boolean);
 
-    setAllRoutes(routes);
     renderRoutesOnMap(routes);
   };
 
@@ -242,74 +239,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         "line-width": 1,
       },
     });
-
-    mapInstance.on("click", "all-routes-layer", (e) => {
-      const index = e.features[0].properties.index;
-      setSelectedRouteIndex(index);
-      highlightSelectedRoute(index);
-    });
-  };
-
-  const highlightSelectedRoute = (index) => {
-    if (index !== undefined && index < allRoutes.length) {
-      const selectedRoute = allRoutes[index];
-
-      if (mapInstance.getLayer("highlighted-route-layer")) {
-        mapInstance.removeLayer("highlighted-route-layer");
-        mapInstance.removeSource("highlighted-route-source");
-      }
-
-      mapInstance.addSource("highlighted-route-source", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [selectedRoute],
-        },
-      });
-
-      mapInstance.addLayer({
-        id: "highlighted-route-layer",
-        type: "line",
-        source: "highlighted-route-source",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "green",
-          "line-width": 2,
-        },
-      });
-    }
-  };
-
-  const updateSourcePoint = () => {
-    const coords = countryCoordinates[source];
-    if (coords) {
-      mapInstance.getSource("source-point").setData({
-        type: "FeatureCollection",
-        features: [
-          {
-            type: "Feature",
-            geometry: { type: "Point", coordinates: coords },
-          },
-        ],
-      });
-
-      if (popupRef.current) {
-        popupRef.current.remove();
-      }
-
-      const popup = new maplibregl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        offset: 15,
-      });
-
-      popup.setLngLat(coords).setHTML(`<div><strong>${source}</strong></div>`).addTo(mapInstance);
-
-      popupRef.current = popup;
-    }
   };
 
   const createCurvedLine = (start, end) => {
@@ -324,8 +253,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     setDestination(null);
     setError(null);
     setHasSubmittedRoute(false);
-    setAllRoutes([]);
-    setSelectedRouteIndex(null);
   };
 
   const handleDestinationChange = (newValue) => {
@@ -357,14 +284,9 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     }
   }, [source, destination, mapInstance]);
 
-  const handleSubmit = () => {
+  const highlightSelectedRoute = () => {
     const currentSource = source;
     const currentDestination = destination;
-
-    if (!currentSource || !currentDestination) {
-      setError("Please select both a source and a destination.");
-      return;
-    }
 
     const startCoords = countryCoordinates[currentSource];
     const endCoords = countryCoordinates[currentDestination];
@@ -434,7 +356,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       }
       setSource(null);
       setDestination(null);
-      setAllRoutes([]);
       setError(
         "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
       );
@@ -447,13 +368,11 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       setSource(null);
       setDestination(null);
       setHasSubmittedRoute(false);
-      setAllRoutes([]);
-      setSelectedRouteIndex(null);
     }
   };
 
   return (
-    <Box sx={{ height: "calc(100vh - 75px)", display: "flex", paddingX: 2, paddingY: 0 }}>
+    <Box sx={{ height: "calc(100vh - 139px)", display: "flex", paddingX: 2, paddingY: 0 }}>
       <Grid container spacing={2} sx={{ height: "100%", flex: 1 }}>
         <Grid item xs={12} md={3}>
           <Grid container spacing={2} sx={{ padding: "16px 0px 0px 16px" }}>
