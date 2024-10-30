@@ -10,8 +10,12 @@ import {
   Avatar,
   Autocomplete,
   Icon,
+  Modal,
+  openModal,
   Divider,
 } from "@mui/material";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import React, { useState } from "react";
 import AdjustOutlinedIcon from "@mui/icons-material/AdjustOutlined";
 import Image from "next/image";
@@ -25,6 +29,19 @@ import { FaExchangeAlt } from "react-icons/fa";
 const SearchBar = ({ source, setSource, destination, setDestination }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isHovered2, setIsHovered2] = useState(false);
+  // const [source, setSource] = useState(null);
+  // const [destination, setDestination] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [options, setOptions] = useState([]);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    setOptions(filteredDestinations);
+  };
+  const handleCloseModal = () => setIsModalOpen(false);
+  const isHandleOpenModal = () => setIsModalOpen2(true);
+  const isHandleCloseModal = () => setIsModalOpen2(false);
 
   const countryCoordinates = {
     Germany: [10.4515, 51.1657],
@@ -55,9 +72,18 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
   );
 
   return (
-    <AppBar position="static" color="transparent" elevation={0} sx={{ padding: "0px 10px" }}>
+    <AppBar
+      position="static"
+      color="transparent"
+      elevation={0}
+      sx={{ padding: "0px 10px" }}
+    >
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", fontFamily: '"Inter", sans-serif' }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: '"Inter", sans-serif',
+        }}
       >
         <Box sx={{ flexGrow: 0, marginTop: "22px", marginLeft: "15px" }}>
           <h2
@@ -78,7 +104,9 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
           }}
         >
           <Autocomplete
-            options={Object.keys(countryCoordinates)}
+            // options={Object.keys(countryCoordinates)}
+            freeSolo
+            options={[]}
             value={source}
             onChange={(event, newValue) => setSource(newValue)}
             renderInput={(params) => (
@@ -166,16 +194,25 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                           display: "flex",
                           alignItems: "center",
                           transition: "filter 0.3s ease",
-                          filter: isHovered ? "brightness(0) saturate(100%)" : "none",
+                          filter: isHovered
+                            ? "brightness(0) saturate(100%)"
+                            : "none",
                         }}
                         onMouseEnter={() => setIsHovered2(true)}
                         onMouseLeave={() => setIsHovered2(false)}
+                        onClick={handleOpenModal}
                       >
-                        <Image src="/assets/VectorA.png" alt="A" height={28} width={28} />
+                        <Image
+                          src="/assets/VectorA.png"
+                          alt="A"
+                          height={28}
+                          width={28}
+                        />
                       </Box>
                     </InputAdornment>
                   ),
                 }}
+                onClick={handleOpenModal}
               />
             )}
           />
@@ -203,8 +240,11 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
               }}
             />
           </Icon>
+
           <Autocomplete
-            options={filteredDestinations}
+            // options={filteredDestinations}
+            freeSolo
+            options={[]}
             value={destination}
             onChange={(event, newValue) => setDestination(newValue)}
             renderInput={(params) => (
@@ -292,26 +332,222 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                           display: "flex",
                           alignItems: "center",
                           transition: "filter 0.3s ease",
-                          filter: isHovered2 ? "brightness(0) saturate(100%)" : "none",
+                          filter: isHovered2
+                            ? "brightness(0) saturate(100%)"
+                            : "none",
                         }}
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
                       >
-                        <Image src="/assets/VectorB.png" alt="A" height={28} width={28} />
+                        <Image
+                          src="/assets/VectorB.png"
+                          alt="A"
+                          height={28}
+                          width={28}
+                        />
                       </Box>
                     </InputAdornment>
                   ),
                 }}
+                onClick={isHandleOpenModal}
               />
             )}
           />
+          {/* // Modal1 */}
+          <Modal open={isModalOpen} onClose={handleCloseModal}>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "14%",
+                left: "42%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: "10px",
+                gap: "20px",
+                margin: 0,
+                padding: "10px 0",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "center",
+                  borderBottom: "1px solid #555",
+                  margin: "10px 0px",
+                }}
+              >
+                <AdjustOutlinedIcon
+                  sx={{
+                    fontSize: "15px",
+                    fontWeight: "bold",
+                    marginLeft: "20px",
+                    marginBottom: "10px",
+                  }}
+                />
+
+                <Autocomplete
+                  options={filteredDestinations}
+                  onChange={(event, newValue) => {
+                    setSource(newValue);
+                    handleCloseModal();
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      placeholder="Where would you like to fly from?"
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                      }}
+                      sx={{
+                        fontSize: "14px",
+                        width: "460%",
+                        ml: 1,
+                        marginBottom: "10px",
+                        bgcolor: "transparent",
+                        "& .MuiInputBase-input": {
+                          padding: "4px 0",
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+
+              <Typography
+                variant="h6"
+                component="h5"
+                sx={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  marginLeft: "15px",
+                  marginTop: "5px",
+                  color: "#555",
+                }}
+              >
+                Advance Research
+              </Typography>
+
+              <Box
+                sx={{
+                  borderRadius: "8px",
+                  padding: "10px",
+                  cursor: "pointer",
+                  mt: 2,
+                }}
+                options={filteredDestinations}
+              ></Box>
+            </Box>
+          </Modal>
+
+          <Modal open={isModalOpen2} onClose={isHandleCloseModal}>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "14%",
+                left: "67%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: "10px",
+                gap: "20px",
+                margin: 0,
+                padding: "10px 0",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "center",
+                  borderBottom: "1px solid #555",
+                  margin: "10px 0px",
+                }}
+              >
+                <AdjustOutlinedIcon
+                  sx={{
+                    fontSize: "15px",
+                    fontWeight: "bold",
+                    marginLeft: "20px",
+                    marginBottom: "10px",
+                  }}
+                />
+                <Autocomplete
+                  options={filteredDestinations}
+                  onChange={(event, newValue) => {
+                    setDestination(newValue);
+                    setIsModalOpen2(false);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      placeholder="Where would you like to fly from?"
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                      }}
+                      sx={{
+                        fontSize: "14px",
+                        width: "460%",
+                        ml: 1,
+                        marginBottom: "10px",
+                        bgcolor: "transparent",
+                        "& .MuiInputBase-input": {
+                          padding: "4px 0",
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+
+              <Typography
+                variant="h6"
+                component="h5"
+                sx={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  marginLeft: "15px",
+                  marginTop: "5px",
+                  color: "#555",
+                }}
+              >
+                Advance Research
+              </Typography>
+
+              <Box
+                sx={{
+                  // border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  padding: "10px",
+                  cursor: "pointer",
+                  mt: 2,
+                }}
+                options={filteredDestinations}
+              ></Box>
+            </Box>
+          </Modal>
         </Box>
 
+        {/* ---------------------- */}
         <Box sx={{ display: "flex", flexDirection: "column", mt: "10px" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button variant="text" size="small" sx={{ textTransform: "none" }}>
               <Box display="flex" alignItems="center" gap={1} marginRight={1}>
-                <Image src="/assets/Flag.png" alt="Flag" height={14} width={20} />
+                <Image
+                  src="/assets/Flag.png"
+                  alt="Flag"
+                  height={14}
+                  width={20}
+                />
                 <Typography
                   variant="body1"
                   sx={{
@@ -328,9 +564,17 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
               </Box>
             </Button>
 
-            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+            >
               <Avatar sx={{ width: 50, height: 50, bgcolor: "white" }}>
-                <PiUserCircleThin style={{ width: "45px", height: "45px" }} color="#bbb" />
+                <PiUserCircleThin
+                  style={{ width: "45px", height: "45px" }}
+                  color="#bbb"
+                />
               </Avatar>
             </Box>
 
@@ -339,7 +583,9 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                 padding: 0,
               }}
             >
-              <PiDotsThreeVerticalBold style={{ width: 35, height: 35, color: "#000" }} />
+              <PiDotsThreeVerticalBold
+                style={{ width: 35, height: 35, color: "#000" }}
+              />
             </IconButton>
           </Box>
           <Box>

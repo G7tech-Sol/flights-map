@@ -60,7 +60,9 @@ const FilterDropdown = ({ filter, selectedOption, children, buttonLabel }) => {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          border: `2px solid ${selectedOption !== "All" && isFocused ? "#FFBF00" : "transparent"}`,
+          border: `2px solid ${
+            selectedOption !== "All" && isFocused ? "#FFBF00" : "transparent"
+          }`,
           borderRadius: "8px",
           margin: "5px 3px",
           transition: "border-color 0.3s ease-in-out",
@@ -187,7 +189,9 @@ const Prices = () => {
   return (
     <FilterDropdown
       filter="Price"
-      buttonLabel={allRange === true ? `$${priceRange[0]} - $${priceRange[1]}` : `All`}
+      buttonLabel={
+        allRange === true ? `$${priceRange[0]} - $${priceRange[1]}` : `All`
+      }
     >
       <Box
         sx={{
