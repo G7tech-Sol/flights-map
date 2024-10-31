@@ -36,8 +36,16 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const popupRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [error, setError] = useState(null);
-  const [hasSubmittedRoute, setHasSubmittedRoute] = useState(false);
   let sourceSetLocally = useRef(false);
+
+  useEffect(() => {
+    if (destination === null) {
+      setTimeout(() => {
+        removeAirplane();
+      }, 300);
+      setDestination(null);
+    }
+  }, [destination]);
 
   useEffect(() => {
     const map = new maplibregl.Map({
@@ -191,6 +199,30 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     return () => cancelAnimationFrame(animationFrameId);
   }, [mapInstance, source]);
 
+  useEffect(() => {
+    if (source !== null && destination !== null && source === destination) {
+      if (mapInstance) {
+        if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+          mapInstance.removeLayer("dynamic-flight-route-layer");
+          mapInstance.removeSource("dynamic-flight-route");
+        }
+        if (mapInstance.getLayer("highlighted-route-layer")) {
+          mapInstance.removeLayer("highlighted-route-layer");
+          mapInstance.removeSource("highlighted-route-source");
+        }
+        if (mapInstance.getLayer("all-routes-layer")) {
+          mapInstance.removeLayer("all-routes-layer");
+          mapInstance.removeSource("all-routes-source");
+        }
+      }
+
+      setSource(null);
+      setDestination(null);
+      setError(null);
+      sourceSetLocally.current = false;
+    }
+  }, [source, destination, mapInstance]);
+
   const calculateAllRoutes = (sourceCountry) => {
     const sourceCoords = countryCoordinates[sourceCountry];
     const routes = Object.keys(countryCoordinates)
@@ -252,23 +284,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     setSource(newValue);
     setDestination(null);
     setError(null);
-    setHasSubmittedRoute(false);
-
-    console.log("Hi", mapInstance);
-    if (mapInstance) {
-      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
-        mapInstance.removeLayer("dynamic-flight-route-layer");
-        mapInstance.removeSource("dynamic-flight-route");
-      }
-      if (mapInstance.getLayer("highlighted-route-layer")) {
-        mapInstance.removeLayer("highlighted-route-layer");
-        mapInstance.removeSource("highlighted-route-source");
-      }
-      if (mapInstance.getLayer("all-routes-layer")) {
-        mapInstance.removeLayer("all-routes-layer");
-        mapInstance.removeSource("all-routes-source");
-      }
-    }
   };
 
   const handleDestinationChange = (newValue) => {
@@ -276,35 +291,11 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     setError(null);
   };
 
-  useEffect(() => {
-    if (source !== null && destination !== null && source === destination) {
-      if (mapInstance) {
-        if (mapInstance.getLayer("dynamic-flight-route-layer")) {
-          mapInstance.removeLayer("dynamic-flight-route-layer");
-          mapInstance.removeSource("dynamic-flight-route");
-        }
-        if (mapInstance.getLayer("highlighted-route-layer")) {
-          mapInstance.removeLayer("highlighted-route-layer");
-          mapInstance.removeSource("highlighted-route-source");
-        }
-        if (mapInstance.getLayer("all-routes-layer")) {
-          mapInstance.removeLayer("all-routes-layer");
-          mapInstance.removeSource("all-routes-source");
-        }
-      }
-
-      setSource(null);
-      setDestination(null);
-      sourceSetLocally.current = false;
-      setError(null);
-    }
-  }, [source, destination, mapInstance]);
-
   const highlightSelectedRoute = async () => {
-    if (mapInstance.getLayer("airplane-layer")) {
-      mapInstance.removeLayer("airplane-layer");
-      mapInstance.removeSource("airplane-point");
-      mapInstance.removeImage("airplane-icon");
+    removeAirplane();
+
+    if (!source || !destination) {
+      return;
     }
 
     const currentSource = source;
@@ -312,6 +303,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
 
     const startCoords = countryCoordinates[currentSource];
     const endCoords = countryCoordinates[currentDestination];
+
     const routeCoordinates = createCurvedLine(startCoords, endCoords);
 
     const isValidRoute =
@@ -354,37 +346,9 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         },
       });
 
-      const image = await mapInstance.loadImage("/assets/airplane.png");
-      mapInstance.addImage("airplane-icon", image.data);
-
-      const midpoint = routeCoordinates[Math.floor(routeCoordinates.length / 2)];
-      const airplaneFeature = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: midpoint,
-        },
-      };
-
-      mapInstance.addSource("airplane-point", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [airplaneFeature],
-        },
-      });
-
-      mapInstance.addLayer({
-        id: "airplane-layer",
-        type: "symbol",
-        source: "airplane-point",
-        layout: {
-          "icon-image": "airplane-icon",
-          "icon-size": 0.5,
-          "icon-anchor": "center",
-          "icon-allow-overlap": true,
-        },
-      });
+      if (source && destination) {
+        addAirplane(startCoords, endCoords, routeCoordinates);
+      }
 
       const bounds = routeCoordinates.reduce((bounds, coord) => {
         return bounds.extend(coord);
@@ -392,7 +356,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
 
       mapInstance.fitBounds(bounds, { padding: 80 });
       setError(null);
-      setHasSubmittedRoute(true);
     } else {
       if (mapInstance) {
         if (mapInstance.getLayer("dynamic-flight-route-layer")) {
@@ -417,13 +380,79 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     }
   };
 
-  const handleNewPointSelection = () => {
-    if (hasSubmittedRoute) {
-      setSource(null);
-      setDestination(null);
-      setHasSubmittedRoute(false);
+  const calculateBearing = (start, end) => {
+    const [lon1, lat1] = start.map((coord) => (coord * Math.PI) / 180);
+    const [lon2, lat2] = end.map((coord) => (coord * Math.PI) / 180);
+
+    const dLon = lon2 - lon1;
+    const x = Math.sin(dLon) * Math.cos(lat2);
+    const y = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    const bearing = (Math.atan2(x, y) * 180) / Math.PI;
+    return (bearing + 360) % 360;
+  };
+
+  const addAirplane = async (startCoords, endCoords, routeCoordinates) => {
+    const image = await mapInstance.loadImage("/assets/black-airplane.png");
+    mapInstance.addImage("airplane-icon", image.data);
+
+    const angle = calculateBearing(startCoords, endCoords);
+    const midpoint = routeCoordinates[Math.floor(routeCoordinates.length / 2)];
+
+    const airplaneFeature = {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: midpoint,
+      },
+    };
+
+    mapInstance.addSource("airplane-point", {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [airplaneFeature],
+      },
+    });
+
+    mapInstance.addLayer({
+      id: "airplane-layer",
+      type: "symbol",
+      source: "airplane-point",
+      layout: {
+        "icon-image": "airplane-icon",
+        "icon-size": 0.3,
+        "icon-anchor": "center",
+        "icon-allow-overlap": true,
+        "icon-rotate": angle,
+      },
+    });
+  };
+
+  const removeAirplane = () => {
+    if (mapInstance) {
+      if (mapInstance.getLayer("airplane-layer")) {
+        mapInstance.removeLayer("airplane-layer");
+        mapInstance.removeSource("airplane-point");
+        mapInstance.removeImage("airplane-icon");
+      }
     }
   };
+
+  useEffect(() => {
+    handleSourceChange(source);
+    handleDestinationChange(null);
+
+    if (mapInstance) {
+      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+        mapInstance.removeLayer("dynamic-flight-route-layer");
+        mapInstance.removeSource("dynamic-flight-route");
+      }
+      if (mapInstance.getLayer("highlighted-route-layer")) {
+        mapInstance.removeLayer("highlighted-route-layer");
+        mapInstance.removeSource("highlighted-route-source");
+      }
+    }
+  }, [source]);
 
   return (
     <Box sx={{ height: "calc(100vh - 139px)", display: "flex", paddingX: 2, paddingY: 0 }}>
@@ -477,7 +506,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
               height: "100%",
               width: "100%",
             }}
-            // onClick={handleNewPointSelection}
           />
         </Grid>
       </Grid>

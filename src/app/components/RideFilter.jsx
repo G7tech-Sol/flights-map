@@ -13,10 +13,10 @@ import {
   InputAdornment,
   Slider,
 } from "@mui/material";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import SearchIcon from "@mui/icons-material/Search";
+// import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+// import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
-import { grey } from "@mui/material/colors";
+// import { grey } from "@mui/material/colors";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
@@ -27,6 +27,7 @@ import DurationFilter from "./DurationFilter";
 import AirCraftFilter from "./AirCraftFilter";
 import AirlinesFilter from "./AirlinesFilter";
 import ClassFilter from "./ClassFilter";
+import DateFilter from "./DateFilter";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -59,40 +60,7 @@ const StyledInputBase = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const CustomSlider = (props) => (
-  <Slider
-    {...props}
-    valueLabelDisplay="auto"
-    min={0}
-    max={1500}
-    step={50}
-    sx={{
-      color: "#FFBF00",
-      height: 8,
-      "& .MuiSlider-thumb": {
-        height: 24,
-        width: 24,
-        backgroundColor: "#fff",
-        border: "2px solid currentColor",
-        "&:hover, &.Mui-focusVisible, &.Mui-active": {
-          boxShadow: "0 0 0 8px rgba(255, 191, 0, 0.16)",
-        },
-      },
-      "& .MuiSlider-rail": {
-        opacity: 0.28,
-      },
-    }}
-  />
-);
-
-const FilterDropdown = ({
-  filter,
-  options,
-  selectedOption,
-  onOptionChange,
-  searchEnabled,
-  // children,
-}) => {
+const FilterDropdown = ({ filter, options, selectedOption, onOptionChange, searchEnabled }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -130,7 +98,7 @@ const FilterDropdown = ({
         borderRadius: "31px",
       }}
     >
-      <Button
+      {/* <Button
         sx={{
           fontSize: "0.85rem",
           color: "#000",
@@ -139,7 +107,9 @@ const FilterDropdown = ({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          border: `2px solid ${isSelected || isFocused ? "#FFBF00" : "transparent"}`,
+          border: `2px solid ${
+            isSelected || isFocused ? "#FFBF00" : "transparent"
+          }`,
           borderRadius: "8px",
           transition: "border-color 0.3s ease-in-out",
           margin: "5px 3px",
@@ -149,7 +119,10 @@ const FilterDropdown = ({
         }}
         onClick={handleOpenMenu}
       >
-        <Typography variant="body2" sx={{ fontSize: "0.80rem", fontFamily: '"Inter", sans-serif' }}>
+        <Typography
+          variant="body2"
+          sx={{ fontSize: "0.80rem", fontFamily: '"Inter", sans-serif' }}
+        >
           {filter}
         </Typography>
         <Box
@@ -164,9 +137,9 @@ const FilterDropdown = ({
           </Typography>
           <KeyboardArrowDownIcon sx={{ fontSize: "16px" }} />
         </Box>
-      </Button>
+      </Button> */}
 
-      <Box>
+      {/* <Box>
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -237,7 +210,7 @@ const FilterDropdown = ({
             ))}
           </RadioGroup>
         </Menu>
-      </Box>
+      </Box> */}
     </Box>
   );
 };
@@ -260,101 +233,6 @@ const Dates = () => {
   );
 };
 
-const Prices = () => {
-  const [priceRange, setPriceRange] = useState([0, 1500]);
-
-  const handlePriceChange = (event, newValue) => {
-    setPriceRange(newValue);
-  };
-
-  return (
-    <FilterDropdown filter="Price">
-      <CustomSlider value={priceRange} onChange={handlePriceChange} />
-      <Typography mt={1}>
-        Range: ${priceRange[0]} - ${priceRange[1]}
-      </Typography>
-    </FilterDropdown>
-  );
-};
-
-const AlliancesFilter = () => {
-  const [selectedOption, setSelectedOption] = useState("All");
-  const optionsAlliances = ["Data", "Oneworld", "SkyTeam", "Star Alliance"];
-
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-
-  return (
-    <FilterDropdown
-      filter="Alliances"
-      options={optionsAlliances}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-      sx={{
-        borderRadius: "20px",
-      }}
-    />
-  );
-};
-
-// Airlines Filter Component
-// const AirlinesFilter = () => {
-//   const [selectedOption, setSelectedOption] = useState('All');
-//   const optionsAirlines = ['Airline A', 'Airline B', 'Airline C', 'Airline D'];
-
-//   const handleOptionChange = (event) => {
-//     setSelectedOption(event.target.value);
-//   };
-
-//   return (
-//     <FilterDropdown
-//       filter="Airlines"
-//       options={optionsAirlines}
-//       selectedOption={selectedOption}
-//       onOptionChange={handleOptionChange}
-//       searchEnabled
-//     />
-//   );
-// };
-
-const ClassesFilter = () => {
-  const [selectedOption, setSelectedOption] = useState("All");
-  const optionsClasses = ["Economy", "Premium Economy", "Business Class", "First Class"];
-
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-
-  return (
-    <FilterDropdown
-      filter="Class"
-      options={optionsClasses}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-    />
-  );
-};
-
-const AircraftFilter = () => {
-  const [selectedOption, setSelectedOption] = useState("All");
-  const optionsAircraft = ["Aircraft A", "Aircraft B", "Aircraft C"];
-
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-
-  return (
-    <FilterDropdown
-      filter="Aircraft"
-      options={optionsAircraft}
-      selectedOption={selectedOption}
-      onOptionChange={handleOptionChange}
-      searchEnabled
-    />
-  );
-};
-
 const RideFilter = () => {
   return (
     <Box
@@ -371,7 +249,7 @@ const RideFilter = () => {
         margin="auto"
         fontSize={2}
       >
-        <Dates />
+        <DateFilter />
         <PriceFilter />
         <AllencesFilter />
         <AirlinesFilter />
