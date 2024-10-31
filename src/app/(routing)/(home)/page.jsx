@@ -10,8 +10,6 @@ const Home = () => {
   const [source, setSource] = useState(null);
   const [destination, setDestination] = useState(null);
 
-  console.log("Hello", source, destination);
-
   return (
     <Box>
       <SearchBar
