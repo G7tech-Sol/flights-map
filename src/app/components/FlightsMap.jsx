@@ -5,7 +5,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { point } from "@turf/helpers";
 import greatCircle from "@turf/great-circle";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 
 const countryCoordinates = {
   Germany: [10.4515, 51.1657],
@@ -232,7 +232,9 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       if (!source) return;
 
       const radius = Math.abs(Math.sin(Date.now() / 500)) * 8 + 8;
-      mapInstance.setPaintProperty("source-point-layer", "circle-radius", radius);
+      if (mapInstance.getLayer("source-point-layer")) {
+        mapInstance.setPaintProperty("source-point-layer", "circle-radius", radius);
+      }
       animationFrameId = requestAnimationFrame(animateSourcePoint);
     };
 
@@ -240,7 +242,9 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       updateSourcePoint();
       animateSourcePoint();
     } else if (mapInstance && !source) {
-      mapInstance.setPaintProperty("source-point-layer", "circle-radius", 0);
+      if (mapInstance.getLayer("source-point-layer")) {
+        mapInstance.setPaintProperty("source-point-layer", "circle-radius", 0);
+      }
       if (popupRef.current) popupRef.current.remove();
       cancelAnimationFrame(animationFrameId);
     }
@@ -333,12 +337,10 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const handleSourceChange = (newValue) => {
     setSource(newValue);
     setDestination(null);
-    setError(null);
   };
 
   const handleDestinationChange = (newValue) => {
     setDestination(newValue);
-    setError(null);
   };
 
   const highlightSelectedRoute = async () => {
@@ -355,11 +357,12 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     const endCoords = countryCoordinates[currentDestination];
 
     const coordinates = createCurvedLine(startCoords, endCoords);
-    console.log("Coordinates", coordinates);
     setRouteCoordinates(coordinates);
 
     const isValidRoute =
       coordinates.length > 5 && coordinates.every((coord) => !isNaN(coord[0]) && !isNaN(coord[1]));
+
+    console.log(isValidRoute);
 
     if (isValidRoute) {
       const flightRoute = {
@@ -422,11 +425,11 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
           mapInstance.removeSource("all-routes-source");
         }
       }
-      setSource(null);
-      setDestination(null);
       setError(
         "Unfortunately, we couldn't find a flight route for your selected destination. Please ensure both locations are served by our airline and try again."
       );
+      setSource(null);
+      setDestination(null);
       sourceSetLocally.current = false;
     }
   };

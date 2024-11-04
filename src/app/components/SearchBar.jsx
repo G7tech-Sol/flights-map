@@ -168,8 +168,8 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                           transition: "filter 0.3s ease",
                           filter: isHovered ? "brightness(0) saturate(100%)" : "none",
                         }}
-                        onMouseEnter={() => setIsHovered2(true)}
-                        onMouseLeave={() => setIsHovered2(false)}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
                       >
                         <Image src="/assets/VectorA.png" alt="A" height={28} width={28} />
                       </Box>
@@ -294,8 +294,8 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
                           transition: "filter 0.3s ease",
                           filter: isHovered2 ? "brightness(0) saturate(100%)" : "none",
                         }}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
+                        onMouseEnter={() => setIsHovered2(true)}
+                        onMouseLeave={() => setIsHovered2(false)}
                       >
                         <Image src="/assets/VectorB.png" alt="A" height={28} width={28} />
                       </Box>
