@@ -36,16 +36,8 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   const popupRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [error, setError] = useState(null);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
   let sourceSetLocally = useRef(false);
-
-  useEffect(() => {
-    if (destination === null) {
-      setTimeout(() => {
-        removeAirplane();
-      }, 300);
-      setDestination(null);
-    }
-  }, [destination]);
 
   useEffect(() => {
     const map = new maplibregl.Map({
@@ -138,6 +130,63 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
 
     return () => map.remove();
   }, []);
+
+  useEffect(() => {
+    if (!mapInstance || routeCoordinates.length < 2) return;
+
+    let index = 0;
+    const animationSpeed = 20;
+
+    const animateAirplane = () => {
+      if (index >= routeCoordinates.length - 1) return;
+
+      const currentCoord = routeCoordinates[index];
+      const nextCoord = routeCoordinates[index + 1];
+      const angle = calculateBearing(currentCoord, nextCoord);
+
+      const airplaneSource = mapInstance.getSource("airplane-point");
+      if (airplaneSource) {
+        airplaneSource.setData({
+          type: "FeatureCollection",
+          features: [{ type: "Feature", geometry: { type: "Point", coordinates: currentCoord } }],
+        });
+
+        mapInstance.setLayoutProperty("airplane-layer", "icon-rotate", angle);
+      }
+
+      index++;
+      setTimeout(() => requestAnimationFrame(animateAirplane), animationSpeed);
+    };
+
+    animateAirplane();
+
+    return () => cancelAnimationFrame(animateAirplane);
+  }, [mapInstance, routeCoordinates]);
+
+  useEffect(() => {
+    handleSourceChange(source);
+    handleDestinationChange(null);
+
+    if (mapInstance) {
+      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
+        mapInstance.removeLayer("dynamic-flight-route-layer");
+        mapInstance.removeSource("dynamic-flight-route");
+      }
+      if (mapInstance.getLayer("highlighted-route-layer")) {
+        mapInstance.removeLayer("highlighted-route-layer");
+        mapInstance.removeSource("highlighted-route-source");
+      }
+    }
+  }, [source]);
+
+  useEffect(() => {
+    if (destination === null) {
+      setTimeout(() => {
+        removeAirplane();
+      }, 300);
+      setDestination(null);
+    }
+  }, [destination]);
 
   useEffect(() => {
     if (source && !destination) {
@@ -269,6 +318,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       paint: {
         "line-color": "grey",
         "line-width": 1,
+        "line-dasharray": [2, 4],
       },
     });
   };
@@ -304,18 +354,19 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     const startCoords = countryCoordinates[currentSource];
     const endCoords = countryCoordinates[currentDestination];
 
-    const routeCoordinates = createCurvedLine(startCoords, endCoords);
+    const coordinates = createCurvedLine(startCoords, endCoords);
+    console.log("Coordinates", coordinates);
+    setRouteCoordinates(coordinates);
 
     const isValidRoute =
-      routeCoordinates.length > 5 &&
-      routeCoordinates.every((coord) => !isNaN(coord[0]) && !isNaN(coord[1]));
+      coordinates.length > 5 && coordinates.every((coord) => !isNaN(coord[0]) && !isNaN(coord[1]));
 
     if (isValidRoute) {
       const flightRoute = {
         type: "Feature",
         geometry: {
           type: "LineString",
-          coordinates: routeCoordinates,
+          coordinates: coordinates,
         },
       };
 
@@ -346,16 +397,16 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         },
       });
 
-      if (source && destination) {
-        addAirplane(startCoords, endCoords, routeCoordinates);
-      }
-
-      const bounds = routeCoordinates.reduce((bounds, coord) => {
+      const bounds = coordinates.reduce((bounds, coord) => {
         return bounds.extend(coord);
-      }, new maplibregl.LngLatBounds().extend(routeCoordinates[0]));
+      }, new maplibregl.LngLatBounds().extend(coordinates[0]));
 
       mapInstance.fitBounds(bounds, { padding: 80 });
       setError(null);
+
+      if (source && destination) {
+        addAirplane(startCoords, endCoords, coordinates);
+      }
     } else {
       if (mapInstance) {
         if (mapInstance.getLayer("dynamic-flight-route-layer")) {
@@ -391,41 +442,53 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     return (bearing + 360) % 360;
   };
 
-  const addAirplane = async (startCoords, endCoords, routeCoordinates) => {
-    const image = await mapInstance.loadImage("/assets/black-airplane.png");
-    mapInstance.addImage("airplane-icon", image.data);
+  const addAirplane = async (startCoords, endCoords, coordinates) => {
+    if (!mapInstance.getSource("airplane-point")) {
+      const image = await mapInstance.loadImage("/assets/airplane.png");
+      mapInstance.addImage("airplane-icon", image.data);
 
-    const angle = calculateBearing(startCoords, endCoords);
-    const midpoint = routeCoordinates[Math.floor(routeCoordinates.length / 2)];
+      const angle = calculateBearing(startCoords, endCoords);
+      const midpoint = coordinates[Math.floor(coordinates.length / 2)];
 
-    const airplaneFeature = {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: midpoint,
-      },
-    };
+      const airplaneFeature = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: midpoint,
+        },
+      };
 
-    mapInstance.addSource("airplane-point", {
-      type: "geojson",
-      data: {
+      mapInstance.addSource("airplane-point", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [airplaneFeature],
+        },
+      });
+
+      mapInstance.addLayer({
+        id: "airplane-layer",
+        type: "symbol",
+        source: "airplane-point",
+        layout: {
+          "icon-image": "airplane-icon",
+          "icon-size": 0.6,
+          "icon-anchor": "center",
+          "icon-allow-overlap": true,
+          "icon-rotate": angle,
+        },
+      });
+    } else {
+      mapInstance.getSource("airplane-point").setData({
         type: "FeatureCollection",
-        features: [airplaneFeature],
-      },
-    });
-
-    mapInstance.addLayer({
-      id: "airplane-layer",
-      type: "symbol",
-      source: "airplane-point",
-      layout: {
-        "icon-image": "airplane-icon",
-        "icon-size": 0.3,
-        "icon-anchor": "center",
-        "icon-allow-overlap": true,
-        "icon-rotate": angle,
-      },
-    });
+        features: [
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: coordinates[0] },
+          },
+        ],
+      });
+    }
   };
 
   const removeAirplane = () => {
@@ -437,22 +500,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       }
     }
   };
-
-  useEffect(() => {
-    handleSourceChange(source);
-    handleDestinationChange(null);
-
-    if (mapInstance) {
-      if (mapInstance.getLayer("dynamic-flight-route-layer")) {
-        mapInstance.removeLayer("dynamic-flight-route-layer");
-        mapInstance.removeSource("dynamic-flight-route");
-      }
-      if (mapInstance.getLayer("highlighted-route-layer")) {
-        mapInstance.removeLayer("highlighted-route-layer");
-        mapInstance.removeSource("highlighted-route-source");
-      }
-    }
-  }, [source]);
 
   return (
     <Box sx={{ height: "calc(100vh - 139px)", display: "flex", paddingX: 2, paddingY: 0 }}>
