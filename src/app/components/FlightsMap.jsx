@@ -448,13 +448,12 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       mapInstance.addImage("airplane-icon", image.data);
 
       const angle = calculateBearing(startCoords, endCoords);
-      const midpoint = coordinates[Math.floor(coordinates.length / 2)];
 
       const airplaneFeature = {
         type: "Feature",
         geometry: {
           type: "Point",
-          coordinates: midpoint,
+          coordinates: startCoords,
         },
       };
 
@@ -484,7 +483,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         features: [
           {
             type: "Feature",
-            geometry: { type: "Point", coordinates: coordinates[0] },
+            geometry: { type: "Point", coordinates: startCoords },
           },
         ],
       });
