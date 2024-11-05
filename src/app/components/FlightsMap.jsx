@@ -362,8 +362,6 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
     const isValidRoute =
       coordinates.length > 5 && coordinates.every((coord) => !isNaN(coord[0]) && !isNaN(coord[1]));
 
-    console.log(isValidRoute);
-
     if (isValidRoute) {
       const flightRoute = {
         type: "Feature",
