@@ -27,27 +27,25 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
   const [isHovered2, setIsHovered2] = useState(false);
 
   const countryCoordinates = {
-    Germany: [10.4515, 51.1657],
-    Spain: [-3.7038, 40.4168],
-    Pakistan: [69.3451, 30.3753],
-    China: [104.1954, 35.8617],
-    "Saudi Arabia": [45.0792, 23.8859],
-    "South Africa": [22.9375, -30.5595],
-    USA: [-95.7129, 37.0902],
-    UK: [-0.1278, 51.5074],
-    Norway: [8.4689, 60.472],
-    Finland: [24.9354, 61.9241],
-    Australia: [133.7751, -25.2744],
-    India: [78.9629, 20.5937],
-    Japan: [138.2529, 36.2048],
-    Canada: [-106.3468, 56.1304],
-    Brazil: [-51.9253, -14.235],
     Argentina: [-63.6167, -38.4161],
-    Russia: [105.3188, 61.524],
-    Mexico: [-102.5528, 23.6345],
+    Australia: [133.7751, -25.2744],
+    China: [104.1954, 35.8617],
+    Egypt: [30.8025, 26.8206],
+    Finland: [24.9354, 61.9241],
+    Germany: [10.4515, 51.1657],
+    India: [78.9629, 20.5937],
     Indonesia: [113.9213, -0.7893],
     Italy: [12.5674, 41.8719],
-    Egypt: [30.8025, 26.8206],
+    Japan: [138.2529, 36.2048],
+    Mexico: [-102.5528, 23.6345],
+    Norway: [8.4689, 60.472],
+    Pakistan: [69.3451, 30.3753],
+    Russia: [105.3188, 61.524],
+    "Saudi Arabia": [45.0792, 23.8859],
+    "South Africa": [22.9375, -30.5595],
+    Spain: [-3.7038, 40.4168],
+    UK: [-0.1278, 51.5074],
+    USA: [-95.7129, 37.0902],
   };
 
   const filteredDestinations = Object.keys(countryCoordinates).filter(
@@ -55,18 +53,17 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
   );
 
   return (
-    <AppBar position="static" color="transparent" elevation={0} sx={{ padding: "0px 10px" }}>
+    <AppBar position="static" color="transparent" elevation={0}>
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", fontFamily: '"Inter", sans-serif' }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: '"Inter", sans-serif',
+          padding: "0px 10px",
+        }}
       >
-        <Box sx={{ flexGrow: 0, marginTop: "22px", marginLeft: "15px" }}>
-          <h2
-            sx={{
-              fontFamily: '"Inter", sans-serif',
-            }}
-          >
-            FlightConnections
-          </h2>
+        <Box sx={{ display: "flex", alignItems: "center", paddingLeft: 1 }}>
+          <Image src="/assets/logo.svg" alt="Logo" width={240} height={40} />
         </Box>
 
         <Box
@@ -360,7 +357,7 @@ const SearchBar = ({ source, setSource, destination, setDestination }) => {
           </Box>
         </Box>
       </Box>
-      <Divider sx={{ borderColor: "#E0E0E0", marginTop: "5px" }} />
+      <Divider sx={{ borderColor: "#E0E0E0" }} />
     </AppBar>
   );
 };

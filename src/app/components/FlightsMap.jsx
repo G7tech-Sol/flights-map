@@ -5,30 +5,28 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { point } from "@turf/helpers";
 import greatCircle from "@turf/great-circle";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 const countryCoordinates = {
-  Germany: [10.4515, 51.1657],
-  Spain: [-3.7038, 40.4168],
-  Pakistan: [69.3451, 30.3753],
-  China: [104.1954, 35.8617],
-  "Saudi Arabia": [45.0792, 23.8859],
-  "South Africa": [22.9375, -30.5595],
-  USA: [-95.7129, 37.0902],
-  UK: [-0.1278, 51.5074],
-  Norway: [8.4689, 60.472],
-  Finland: [24.9354, 61.9241],
-  Australia: [133.7751, -25.2744],
-  India: [78.9629, 20.5937],
-  Japan: [138.2529, 36.2048],
-  Canada: [-106.3468, 56.1304],
-  Brazil: [-51.9253, -14.235],
   Argentina: [-63.6167, -38.4161],
-  Russia: [105.3188, 61.524],
-  Mexico: [-102.5528, 23.6345],
+  Australia: [133.7751, -25.2744],
+  China: [104.1954, 35.8617],
+  Egypt: [30.8025, 26.8206],
+  Finland: [24.9354, 61.9241],
+  Germany: [10.4515, 51.1657],
+  India: [78.9629, 20.5937],
   Indonesia: [113.9213, -0.7893],
   Italy: [12.5674, 41.8719],
-  Egypt: [30.8025, 26.8206],
+  Japan: [138.2529, 36.2048],
+  Mexico: [-102.5528, 23.6345],
+  Norway: [8.4689, 60.472],
+  Pakistan: [69.3451, 30.3753],
+  Russia: [105.3188, 61.524],
+  "Saudi Arabia": [45.0792, 23.8859],
+  "South Africa": [22.9375, -30.5595],
+  Spain: [-3.7038, 40.4168],
+  UK: [-0.1278, 51.5074],
+  USA: [-95.7129, 37.0902],
 };
 
 const FlightsMap = ({ source, setSource, destination, setDestination }) => {
@@ -44,7 +42,11 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
       container: mapContainer.current,
       style: "https://demotiles.maplibre.org/style.json",
       center: [30, 20],
-      zoom: 2,
+      zoom: 1,
+      // maxBounds: [
+      //   [-175, -90],
+      //   [175, 90],
+      // ],
     });
 
     map.on("load", () => {
@@ -164,6 +166,10 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   }, [mapInstance, routeCoordinates]);
 
   useEffect(() => {
+    console.log(source);
+    if (source) {
+      sourceSetLocally.current = true;
+    }
     handleSourceChange(source);
     handleDestinationChange(null);
 
@@ -402,7 +408,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
         return bounds.extend(coord);
       }, new maplibregl.LngLatBounds().extend(coordinates[0]));
 
-      mapInstance.fitBounds(bounds, { padding: 80 });
+      mapInstance.fitBounds(bounds, { padding: 30 });
       setError(null);
 
       if (source && destination) {
@@ -502,7 +508,7 @@ const FlightsMap = ({ source, setSource, destination, setDestination }) => {
   };
 
   return (
-    <Box sx={{ height: "calc(100vh - 139px)", display: "flex", paddingX: 2, paddingY: 0 }}>
+    <Box sx={{ height: "calc(100vh - 135px)", display: "flex", paddingX: 2, paddingY: 0 }}>
       <Grid container spacing={2} sx={{ height: "100%", flex: 1 }}>
         <Grid item xs={12} md={3}>
           <Grid container spacing={2} sx={{ padding: "16px 0px 0px 16px" }}>
