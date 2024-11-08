@@ -10,7 +10,6 @@ import {
   Divider,
   TextField,
   InputAdornment,
-  IconButton,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
