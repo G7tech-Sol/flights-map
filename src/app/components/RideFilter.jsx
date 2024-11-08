@@ -1,31 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Menu,
-  RadioGroup,
-  FormControlLabel,
-  Divider,
-  Radio,
-  TextField,
-  InputAdornment,
-  Slider,
-} from "@mui/material";
-// import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-// import SearchIcon from "@mui/icons-material/Search";
+import { Box, Radio, TextField } from "@mui/material";
+
 import { styled } from "@mui/material/styles";
-// import { grey } from "@mui/material/colors";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import AllencesFilter from "./AllianceFilter";
-import PriceFilter from "./priceFilter";
+import PriceFilter from "./PriceFilter";
 import DistanceFilter from "./DistanceFilter";
 import DurationFilter from "./DurationFilter";
 import AirCraftFilter from "./AirCraftFilter";
-import AirlinesFilter from "./AirlinesFilter";
+import AirlinesFilter from "./AirLinesFilter";
 import ClassFilter from "./ClassFilter";
 import DateFilter from "./DateFilter";
 
